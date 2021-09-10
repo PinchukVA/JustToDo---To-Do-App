@@ -1,37 +1,34 @@
 import React from 'react';
 
 
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import './App.scss';
 
-import  SignUp  from '../pages/signUp/SignUp.js'
-import  SignIn  from '../pages/signIn/SignIn.js';
-import  Tasks  from '../pages/tasks/Tasks.js';
-import  Users  from '../pages/users/Users.js';
-import  Main  from '../components/main/Main.js'
+import { SignUp, SignIn, Tasks, Users } from '../pages'
+import { Navigation } from '../components'
 
 function App() {
   return (
     <Router>
 
-      <Route path="/">
-            <Main />
+      <Route path='/'>
+            <Navigation />
       </Route>
 
-      <Route exact path="/register">
+      <Route exact path='/signUp'>
             <SignUp />
       </Route>
 
-      <Route exact path="/login">
+      <Route exact path='/signIn'>
             <SignIn />
       </Route>
 
-      <Route exact path="/tasks">
+      <Route exact path='/tasks'>
             <Tasks />
       </Route>
 
-      <Route exact path="/users">
+      <Route exact path='/users'>
             <Users />
       </Route>
 
