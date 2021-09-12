@@ -1,0 +1,16 @@
+.navigation-nav{
+  width: 100%;
+  max-width: 1170px;
+  margin: 0px auto;
+  border-bottom: 1px solid #141f90c7;
+}
+.navigation-list{
+  list-style: none;
+  display: flex;
+  justify-content:right;
+  align-items: center;
+
+  li {
+    margin: 10px;
+  }
+}
