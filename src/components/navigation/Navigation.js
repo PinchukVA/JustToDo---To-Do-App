@@ -3,16 +3,18 @@ import { Link} from 'react-router-dom';
 
 import './Navigation.scss';
 
+import { Routes } from '../../utils/routes.js'
+
 function Navigation () {
   return (
     <>
-      <h1> Привет я стартовая страница 1</h1>
-      <ul>
-        <li><Link to='/signIn'>Логин</Link></li>
-        <li><Link to='/signUp'>Регистрация</Link></li>
-        <li><Link to='/users'>Пользователи</Link></li>
-        <li><Link to='/tasks'>Список заданий</Link></li>
+    <nav className='navigation-nav'>
+    <ul className='navigation-list'>
+        <li><Link to={Routes.TasksRoute}>Список заданий</Link></li>
+        <li><Link to={Routes.UsersRoute}>Пользователи</Link></li>
+        <li><Link to={Routes.SignInRoute}>Выход</Link></li>
       </ul>
+    </nav>
     </>
   )
 }
