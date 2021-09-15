@@ -3,12 +3,11 @@ import React  from 'react';
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-// import '../scss/Variables.scss';
 import './App.scss';
 import './Normalize.scss';
 
 import { Routes } from '../utils/routes.js'
-import {AutorizedRoutes, NotAutorizedRoutes} from '../components/routes'
+// import {AutorizedRoutes, NotAutorizedRoutes} from '../components/routes'
 import { SignUp, SignIn, Tasks, Users, Home } from '../pages'
 import { Navigation } from '../components/index.js'
 
