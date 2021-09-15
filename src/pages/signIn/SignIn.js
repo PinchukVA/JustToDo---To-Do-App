@@ -10,8 +10,8 @@ function SignIn () {
 
   const [textPasword, setTextPasword] = useState('');
   const [textMail, setTextMail] = useState('');
-  const [helpMessageMail, setTextMai] = useState('');
-  const [helpMessagePass, setTextMai] = useState('');
+  // const [helpMessageMail, setTextMai] = useState('');
+  // const [helpMessagePass, setTextMai] = useState('');
 
   const handleChangePaswordText = e => {
     setTextPasword(e.target.value);
@@ -42,7 +42,10 @@ function SignIn () {
               id="signIn-password"
               onChange={handleChangePaswordText}
             />
-            <button className="signIn_logIn-button">Log In</button>
+            <input  className="signIn_logIn-button"
+              type="button"
+              value="Log In"
+            />
             </form>
           </div>
           <div className="signIn-form_link" >

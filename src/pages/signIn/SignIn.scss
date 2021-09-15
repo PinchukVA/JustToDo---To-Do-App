@@ -1,3 +1,4 @@
+@import "../../scss/Variables.scss";
 
 .signIn{
   width: 100%;
@@ -11,16 +12,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-    margin: 10px;
-    padding: 10px 0;
-    max-width: 320px;
-    width: 100%
+  margin: 10px;
+  padding: 10px 0;
+  max-width: 320px;
+  width: 100%;
 }
 
 .signIn-form_block{
   max-width: 320px;
   width: 100%;
-  background-color: rgba(var(--d87,255,255,255),1);
+  background-color: $background-white;
   border: 1px solid #dbdbdb;
   border-radius: 1px;
   margin: 10px 0px;
@@ -33,6 +34,7 @@
   text-transform: uppercase;
   padding: 10px;
   text-align: center;
+  color:$text-black;
 }
 
 .signIn_form{
@@ -45,25 +47,27 @@
   font-size: 12px;
   font-weight: 400;
   padding: 5px 0px;
+  color:$text-black;
 }
 .signIn_input{
       background: rgba(var(--b3f, 250, 250, 250), 1);
       outline: 0;
       overflow: hidden;
-      border: 1px solid #beb8b8;
+      border: 1px solid $border-color-main;
       padding: 5px 0 5px 10px;
       margin: 3px 0px 25px;
       font-size: 18px;
       width: 70%;
+      color:$text-black;
 }
 .signIn_logIn-button{
   width: 75%;
   font-family: 'PT Sans', sans-serif;
-  background-color: #00b7a5;
+  background-color: $color-mint;
   border-radius: 5px;
   border-style: none;
   font-size: 14px;
-  color: #fff;
+  color: $text-white;
   padding: 5px;
   font-weight: 700;
   margin: 0px 0px 20px;
@@ -71,7 +75,7 @@
 
   &:hover{
     cursor: pointer;
-    background-color: #1E8449;
+    background-color: $color-green;
     transition: 0.3s;
   }
 }
@@ -81,8 +85,8 @@
   justify-content:space-around;
   max-width: 320px;
   width: 100%;
-  background-color: #fff;
-  border: 1px solid #dbdbdb;
+  background-color: $background-white;
+  border: 1px solid $border-color-main;
   border-radius: 1px;
   margin: 10px 0px;
 }
@@ -90,19 +94,20 @@
   font-family: 'PT Sans', sans-serif;
   font-size: 14px;
   font-weight: 400;
+  color:$text-black;
 }
 .signIn_link-text{
   font-family: 'PT Sans', sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color:#00b7a5;
+  color:$color-mint;
   text-decoration: none;
   transition: 0.3s;
 
   &:hover{
     text-decoration: none;
     cursor: pointer;
-    color: #1E8449;
+    color: $color-green;
     transition: 0.3s;
   }
 }
