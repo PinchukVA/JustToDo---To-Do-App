@@ -37,9 +37,10 @@ function SignUp () {
       if (inputName === 'passwordValue'){
         loginFormErrorCopy.passwordRepeatError = '';
         setLoginFormError(loginFormErrorCopy)
+
         loginFormCopy.passwordRepeatValue = '';
         setLoginForm(loginFormCopy);
-        // clearField(passwordRepeatValue);
+
       }
 
       loginFormCopy[inputName] = event.target.value;
@@ -56,7 +57,7 @@ function SignUp () {
         loginFormError.passwordError = 'notValued';
         setLoginFormError(loginFormError);
         console.log('возвращаем ошибку')
-        return true
+        return result
       }
       console.log('не возвращаем ошибку', result)
       return result
@@ -70,7 +71,7 @@ function SignUp () {
         loginFormError.passwordRepeatError = 'notValued';
         setLoginFormError(loginFormError);
         console.log('возвращаем ошибку')
-        return true
+        return result
       }
       console.log('не возвращаем ошибку', result)
       return result
@@ -85,8 +86,8 @@ function SignUp () {
       if ( !result || ! (loginForm.nickNameValue.length >= 5)){
         loginFormError.nickNameError = 'notValued';
          setLoginFormError(loginFormError);
-         console.log('возвращаем ошибку')
-         return true
+         console.log('возвращаем ошибку', result)
+         return result
       }
       console.log('не возвращаем ошибку', result)
       return result
@@ -102,7 +103,7 @@ function SignUp () {
         loginFormError.emailError = 'notValued';
         setLoginFormError(loginFormError);
         console.log('возвращаем ошибку')
-        return true
+        return result
       }
       console.log('не возвращаем ошибку', result)
       return result
@@ -111,61 +112,77 @@ function SignUp () {
     const handleCheckEmptyInput = ( loginForm, loginFormError, inputName= '', errorName = '' ) => {
       console.log('Проверка пустого поля', inputName)
       console.log('Проверка пустого поля - поле ошибки', errorName)
+      console.log('Проверка пустого поля - поле значений', loginForm)
       if ( loginForm[inputName] === ''){
           loginFormError[errorName] = 'empty'
           setLoginFormError(loginFormError)
-          console.log('объект с ошибками',loginFormError)
-          return true
+          return false
       }
-      return false
+      return true
     }
 
     const handleCheckInput = ( event = {}, inputName = '', errorName = '' ) => {
       console.log('Проверка инпута', inputName)
       const loginFormCopy = {...loginForm};
       const loginFormErrorCopy = {...loginFormError}
+      console.log('объект с значениями',loginFormCopy)
+      console.log('объект с ошибками',loginFormErrorCopy)
 
       if ( inputName === 'nickNameValue'){
-        if (handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)){
-          return true
+        if (!(handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName))){
+          return false
         }
-        handleCheckDifficultNickName(loginFormCopy, loginFormErrorCopy)
+        return handleCheckDifficultNickName(loginFormCopy, loginFormErrorCopy)
       }
 
       if ( inputName === 'emailValue'){
-        if (handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)){
-          return true
+        if (!(handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName))){
+          return false
         }
-        handleCheckEmailValidation(loginFormCopy, loginFormErrorCopy)
+        return handleCheckEmailValidation(loginFormCopy, loginFormErrorCopy)
       }
 
       if ( inputName === 'passwordValue'){
-        if (handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)){
-          return true
+        if (!(handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName))){
+          return false
         }
-        handleCheckPasswordValidation(loginFormCopy, loginFormErrorCopy)
+        return handleCheckPasswordValidation(loginFormCopy, loginFormErrorCopy)
       }
 
       if ( inputName === 'passwordRepeatValue'){
-        if (handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)){
-          return true
+        if (!(handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName))){
+          return false
         }
-        handleCheckPasswordRepeat(loginFormCopy, loginFormErrorCopy)
-      }
+        return handleCheckPasswordRepeat(loginFormCopy, loginFormErrorCopy)
+      } 
 
       if ( inputName === 'roleValue'){
-        handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)
+        return handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)
       }
 
       if ( inputName === 'adminIdValue'){
-        handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)
+        return  handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)
       }
-      console.log('состояние поля', loginFormCopy)
+      
     }
 
     const handleSubmitForm = (event) => {
       event.preventDefault();
-      
+
+      const loginFormCopy = {...loginForm};
+      const loginFormErrorCopy = {...loginFormError}
+      let resultArray = []
+      const nameValues = Object.keys(loginFormCopy);
+      const errorValues = Object.keys(loginFormErrorCopy);
+
+      for ( let i = 0; i < nameValues.length ; i++ ){
+        console.log(nameValues[i])
+        console.log(errorValues[i])
+        resultArray[i] = handleCheckInput( {}, nameValues[i], errorValues[i] )
+      }
+      // resultArray = nameValues.map(item => handleCheckInput({}, item, errorValues[nameValues.indexOf(item)]))
+
+      console.log(resultArray)
       // if form is empty - return
       // if (  handleCheckEmptyForm() ){
       //     console.log('РЕТУРНУЛИСЬ')
