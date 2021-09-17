@@ -8,9 +8,9 @@ import { Preview } from '../../components'
 
 function SignIn () {
 
-    const [loginForm, setLoginForm] = useState({loginValue:'', passwordValue:''})
+    const [loginForm, setLoginForm] = useState({nickNameValue:'', passwordValue:''})
     // Types form Errors 'empty', 'notValued', 'notExists'
-    const [loginFormError, setLoginFormError] = useState({loginError:'', passwordError:''}) 
+    const [loginFormError, setLoginFormError] = useState({nickNameError:'', passwordError:''}) 
 
     const handleCheckEmptyInput = (loginForm, loginFormError, inputName, errorName ) => {
         if ( loginForm[inputName] === ''){
@@ -20,20 +20,7 @@ function SignIn () {
         
         return false
     }
-    const handleCheckEmailValidation = () =>{
-         const loginFormErrorCopy = {...loginFormError}
-         const loginFormCopy = {...loginForm}
-         const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-         const result = re.test(String(loginFormCopy.loginValue).toLowerCase());
-
-         if ( !result ){
-            loginFormErrorCopy.loginError = 'notValued';
-            setLoginFormError(loginFormErrorCopy);
-         }
-         
-         return result
-    }
-
+    
     const handleCheckEmptyForm =(event = {}, inputName = '', errorName = '') =>{
         const loginFormCopy = {...loginForm};
         const loginFormErrorCopy = {...loginFormError};
@@ -46,7 +33,7 @@ function SignIn () {
             resultCheckEmpty = handleCheckEmptyInput (loginFormCopy, loginFormErrorCopy, inputName, errorName)
             setLoginFormError(loginFormErrorCopy)
         } else {
-            resultCheckEmptyLogin = handleCheckEmptyInput (loginFormCopy, loginFormErrorCopy, 'loginValue', 'loginError')
+            resultCheckEmptyLogin = handleCheckEmptyInput (loginFormCopy, loginFormErrorCopy, 'nickNameValue', 'nickNameError')
             resultCheckEmptyPassword = handleCheckEmptyInput (loginFormCopy, loginFormErrorCopy, 'passwordValue', 'passwordError')
             resultCheckEmpty = resultCheckEmptyLogin || resultCheckEmptyPassword
 
@@ -68,7 +55,7 @@ function SignIn () {
         event.preventDefault();
         
         // if form is empty - return
-        if (  handleCheckEmptyForm() || !handleCheckEmailValidation() ){
+        if (  handleCheckEmptyForm() ){
             console.log('РЕТУРНУЛИСЬ')
             return;
         }
@@ -76,8 +63,8 @@ function SignIn () {
         //else we send Post request
     }
 
-    const { loginValue,passwordValue } = loginForm;
-    const { loginError,passwordError } = loginFormError;
+    const { nickNameValue,passwordValue } = loginForm;
+    const { nickNameError,passwordError } = loginFormError;
 
     return (
         <>
@@ -100,27 +87,24 @@ function SignIn () {
                         className='signIn-label' 
                         htmlFor='signIn-e-mail'
                     >
-                        e-mail
+                        Nickname
                     </label>
 
                     <input
                         className='signIn_input'
                         id='signIn-e-mail'
                         name='login'
-                        type='email' 
-                        value={loginValue}
-                        onChange={event => handleChangeLoginForm(event, 'loginValue', 'loginError')}
-                        onBlur ={event => handleCheckEmptyForm(event, 'loginValue', 'loginError')}
+                        type='text' 
+                        value={nickNameValue}
+                        onChange={event => handleChangeLoginForm(event, 'nickNameValue', 'nickNameError')}
+                        onBlur ={event => handleCheckEmptyForm(event, 'nickNameValue', 'nickNameError')}
                     />
 
                     { 
-                        loginError === 'empty' && <span className='signIn_error'>Enter login</span> 
+                        nickNameError === 'empty' && <span className='signIn_error'>Enter nickname</span> 
                     }
                     { 
-                        loginError === 'notValued' && <span className='signIn_error'>The email you entered is not in the correct format. Please check.</span> 
-                    }
-                    { 
-                        loginError === 'notExists' && <span className='signIn_error'>User is not found</span>
+                        nickNameError === 'notExists' && <span className='signIn_error'>User is not found</span>
                     }
 
                     <label 

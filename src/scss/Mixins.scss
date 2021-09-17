@@ -1,0 +1,30 @@
+@mixin main-form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0px 15px;
+  padding: 10px 0;
+  max-width: 320px;
+  width: 100%;
+}
+
+@mixin main-form-block{
+  max-width: 320px;
+  width: 100%;
+  background-color: $background-white;
+  border: 1px solid #dbdbdb;
+  border-radius: 1px;
+  margin: 10px 0px;
+}
+
+@mixin form-input{
+  background: $background-main;
+  outline: 0;
+  overflow: hidden;
+  border: 1px solid $border-color-main;
+  padding: 5px 0 5px 10px;
+  margin: 3px 0px 5px;
+  font-size: 16px;
+  width: 70%;
+  color:$text-black;
+}

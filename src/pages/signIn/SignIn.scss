@@ -1,5 +1,6 @@
 @import '../../scss/Variables.scss';
 @import '../../scss/Extend.scss';
+@import '../../scss/Mixins.scss';
 
 .signIn {
   width: 100%;
@@ -10,22 +11,11 @@
   align-items: center;
 }
 .signIn-form_main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 10px;
-  padding: 10px 0;
-  max-width: 320px;
-  width: 100%;
+  @include main-form;
 }
 
 .signIn-form_block {
-  max-width: 320px;
-  width: 100%;
-  background-color: $background-white;
-  border: 1px solid #dbdbdb;
-  border-radius: 1px;
-  margin: 10px 0px;
+  @include main-form-block;
   }
 
 .signIn_logo-text {
@@ -52,15 +42,7 @@
   color:$text-black;
 }
 .signIn_input {
-      background: $background-main;
-      outline: 0;
-      overflow: hidden;
-      border: 1px solid $border-color-main;
-      padding: 5px 0 5px 10px;
-      margin: 3px 0px 5px;
-      font-size: 18px;
-      width: 70%;
-      color:$text-black;
+  @include form-input;
 }
 .signIn_logIn-button {
   width: 75%;
