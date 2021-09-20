@@ -8,7 +8,7 @@ import { Preview } from '../../components'
 
 function SignUp () {
 
-  const [loginForm, setLoginForm] = useState({
+  const [signUpForm, setSignUpForm] = useState({
       nickNameValue:'',
       emailValue:'', 
       passwordValue:'', 
@@ -17,8 +17,8 @@ function SignUp () {
       adminIdValue:''
     })
 
-    // Types form Errors 'empty', 'notValued', 'notExists', 'notRepeat'
-    const [loginFormError, setLoginFormError] = useState({
+    // Types form Errors 'empty', 'notValid', 'notExists', 'notRepeat'
+    const [signUpFormError, setSignUpFormError] = useState({
       nickNameError:'',
       emailError:'', 
       passwordError:'', 
@@ -27,177 +27,166 @@ function SignUp () {
       adminIdError:''
     })
 
-    const handleChangeLoginForm = (event, inputName, errorName) => {
-      const loginFormCopy = {...loginForm};
-      const loginFormErrorCopy = {...loginFormError};
+    const { nickNameValue, emailValue, passwordValue, passwordRepeatValue, roleValue, adminIdValue  } = signUpForm;
 
-      loginFormErrorCopy[errorName] = '';
-      setLoginFormError(loginFormErrorCopy)
+    const { nickNameError, emailError, passwordError, passwordRepeatError, roleError, adminIdError } = signUpFormError;
+
+    // useEffect(() => { console.log('useEffect - signUpFormError', signUpFormError) }, [signUpFormError])
+
+    const handleChangeForm = (event, inputName, errorName) => {
+      const signUpFormCopy = {...signUpForm};
+      const signUpFormErrorCopy = {...signUpFormError};
+
+      signUpFormErrorCopy[errorName] = '';
+      setSignUpFormError(signUpFormErrorCopy)
 
       if (inputName === 'passwordValue'){
-        loginFormErrorCopy.passwordRepeatError = '';
-        setLoginFormError(loginFormErrorCopy)
+        signUpFormErrorCopy.passwordRepeatError = '';
+        setSignUpFormError(signUpFormErrorCopy)
 
-        loginFormCopy.passwordRepeatValue = '';
-        setLoginForm(loginFormCopy);
+        signUpFormCopy.passwordRepeatValue = '';
+        setSignUpForm(signUpFormCopy);
 
       }
 
-      loginFormCopy[inputName] = event.target.value;
-      setLoginForm(loginFormCopy);
+      signUpFormCopy[inputName] = event.target.value;
+      setSignUpForm(signUpFormCopy);
     }
 
-    const handleCheckPasswordValidation = (loginForm, loginFormError) =>{
-  
-      const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+    const handleCheckEmptyInput = ( signUpForm, signUpFormError, inputName= '', errorName = '' ) => {
 
-      const result = re.test(String(loginForm.passwordValue).toLowerCase());
-
-      if ( !result ){
-        loginFormError.passwordError = 'notValued';
-        setLoginFormError(loginFormError);
-        console.log('возвращаем ошибку')
-        return result
+      if (inputName === 'adminIdValue' ){
+        
+        if (roleValue === 'user' && signUpForm[inputName] === '' ){
+          signUpFormError[errorName] = 'empty'
+          return false
+        }
+        return true
       }
-      console.log('не возвращаем ошибку', result)
-      return result
-    }
 
-    const handleCheckPasswordRepeat = (loginForm, loginFormError) =>{
-
-      const result = loginForm.passwordValue === loginForm.passwordRepeatValue;
-
-      if ( !result ){
-        loginFormError.passwordRepeatError = 'notValued';
-        setLoginFormError(loginFormError);
-        console.log('возвращаем ошибку')
-        return result
-      }
-      console.log('не возвращаем ошибку', result)
-      return result
-    }
-
-    const handleCheckDifficultNickName = (loginForm, loginFormError) =>{
-  
-      const re = /(?=(?:.*[a-zA-Z]){3,})/;
-
-      const result = re.test(String(loginForm.nickNameValue).toLowerCase());
-
-      if ( !result || ! (loginForm.nickNameValue.length >= 5)){
-        loginFormError.nickNameError = 'notValued';
-         setLoginFormError(loginFormError);
-         console.log('возвращаем ошибку', result)
-         return result
-      }
-      console.log('не возвращаем ошибку', result)
-      return result
-    }
-
-    const handleCheckEmailValidation = (loginForm, loginFormError ) =>{
-    
-      const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-      const result = re.test(String(loginForm.emailValue).toLowerCase());
-
-      if ( !result ){
-        loginFormError.emailError = 'notValued';
-        setLoginFormError(loginFormError);
-        console.log('возвращаем ошибку')
-        return result
-      }
-      console.log('не возвращаем ошибку', result)
-      return result
-    }
-
-    const handleCheckEmptyInput = ( loginForm, loginFormError, inputName= '', errorName = '' ) => {
-      console.log('Проверка пустого поля', inputName)
-      console.log('Проверка пустого поля - поле ошибки', errorName)
-      console.log('Проверка пустого поля - поле значений', loginForm)
-      if ( loginForm[inputName] === ''){
-          loginFormError[errorName] = 'empty'
-          setLoginFormError(loginFormError)
+      if ( signUpForm[inputName] === ''){
+          signUpFormError[errorName] = 'empty'
+          console.log('проверяемся в пустом поле',signUpFormError)
           return false
       }
       return true
     }
 
-    const handleCheckInput = ( event = {}, inputName = '', errorName = '' ) => {
-      console.log('Проверка инпута', inputName)
-      const loginFormCopy = {...loginForm};
-      const loginFormErrorCopy = {...loginFormError}
-      console.log('объект с значениями',loginFormCopy)
-      console.log('объект с ошибками',loginFormErrorCopy)
+    const handleCheckPasswordValidation = (signUpFormError) =>{
 
-      if ( inputName === 'nickNameValue'){
-        if (!(handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName))){
-          return false
-        }
-        return handleCheckDifficultNickName(loginFormCopy, loginFormErrorCopy)
+      const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+
+      const result = re.test(String(signUpForm.passwordValue).toLowerCase());
+      if ( !result && passwordValue !== '' ){
+        signUpFormError.passwordError = 'notValid';
       }
+      return result
+    }
 
-      if ( inputName === 'emailValue'){
-        if (!(handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName))){
-          return false
-        }
-        return handleCheckEmailValidation(loginFormCopy, loginFormErrorCopy)
+    const handleCheckPasswordRepeat = (signUpFormError) =>{
+      const result = signUpForm.passwordValue === signUpForm.passwordRepeatValue;
+      if ( !result &&  passwordRepeatValue !==''){
+        signUpFormError.passwordRepeatError = 'notValid';
+        return !result;
       }
+      return result
+    }
 
-      if ( inputName === 'passwordValue'){
-        if (!(handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName))){
-          return false
+    const handleCheckDifficultNickName = (signUpFormError) =>{
+
+      const re = /(?=(?:.*[a-zA-Z]){3,})/;
+
+      const result = re.test(String(signUpForm.nickNameValue).toLowerCase());
+
+      if ( nickNameValue !== ''){
+        if ( !result || ! (signUpForm.nickNameValue.length >= 5 )){
+          signUpFormError.nickNameError = 'notValid';
         }
-        return handleCheckPasswordValidation(loginFormCopy, loginFormErrorCopy)
+        return result
       }
+    }
 
-      if ( inputName === 'passwordRepeatValue'){
-        if (!(handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName))){
-          return false
-        }
-        return handleCheckPasswordRepeat(loginFormCopy, loginFormErrorCopy)
+    const handleCheckEmailValidation = ( signUpFormError ) =>{
+
+      const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+      const result = re.test(String(signUpForm.emailValue).toLowerCase());
+
+      if ( !result && emailValue !== '' ){
+        signUpFormError.emailError = 'notValid';
+      }
+    }
+
+    const handleCheckForm = ( event = {}, inputName = '', errorName = '') => {
+
+      let signUpFormCopy = {...signUpForm};
+      let signUpFormErrorCopy = {...signUpFormError};
+
+      let valuesNameForm = Object.keys (signUpFormCopy)
+      let valueErrorForm = Object.keys (signUpFormErrorCopy)
+
+      handleCheckDifficultNickName(signUpFormErrorCopy)
+      handleCheckEmailValidation(signUpFormErrorCopy)
+      handleCheckPasswordValidation(signUpFormErrorCopy)
+      handleCheckPasswordRepeat(signUpFormErrorCopy)
+
+      if ( inputName !== '' && errorName !== '' ) {
+
+          handleCheckEmptyInput ( 
+          signUpFormCopy, 
+          signUpFormErrorCopy,
+          inputName, 
+          errorName
+        )
+
+        setSignUpFormError(signUpFormErrorCopy)
       } 
 
-      if ( inputName === 'roleValue'){
-        return handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)
+      if ( inputName === '' && errorName === '' ) {
+        
+        for ( let i = 0; i < valuesNameForm.length; i++ ){
+            handleCheckEmptyInput ( 
+              signUpFormCopy, 
+              signUpFormErrorCopy, 
+              valuesNameForm[i], 
+              valueErrorForm[i]
+            )
+            setSignUpFormError(signUpFormErrorCopy)
+        }
       }
-
-      if ( inputName === 'adminIdValue'){
-        return  handleCheckEmptyInput(loginFormCopy, loginFormErrorCopy, inputName, errorName)
-      }
-      
+      let valueErrorArray = Object.values (signUpFormErrorCopy)
+      let result =  valueErrorArray.every(item => item === '' )
+      console.log('handleCheckForm - могу отправить запрос?',result )
+      console.log('handleCheckForm - массив значений ошибок',valueErrorArray )
+      console.log('handleCheckForm - объект ошибок',signUpFormErrorCopy )
+      return result
     }
 
     const handleSubmitForm = (event) => {
       event.preventDefault();
 
-      const loginFormCopy = {...loginForm};
-      const loginFormErrorCopy = {...loginFormError}
-      let resultArray = []
-      const nameValues = Object.keys(loginFormCopy);
-      const errorValues = Object.keys(loginFormErrorCopy);
+      // console.log('handleSubmitFormht результат возрата ошибок',  handleCheckForm())
+      const canSubmit = handleCheckForm();
+      console.log('STATE - объект ошибок',signUpFormError )
+      const signUpFormErrorCopy = {...signUpFormError}
+      console.log('КОПИЯ - объект ошибок',signUpFormErrorCopy )
+      const valueErrors = Object.values(signUpFormErrorCopy)
+      console.log('Массив ошибок',valueErrors )
+      const canSubmitForm = valueErrors.every(item => item === '' )
+      console.log('Я могу отправить запрос?:',canSubmitForm )
 
-      for ( let i = 0; i < nameValues.length ; i++ ){
-        console.log(nameValues[i])
-        console.log(errorValues[i])
-        resultArray[i] = handleCheckInput( {}, nameValues[i], errorValues[i] )
+      if ( canSubmit){
+        console.log('ты ОТПРАВИЛ запрос')
       }
-      // resultArray = nameValues.map(item => handleCheckInput({}, item, errorValues[nameValues.indexOf(item)]))
-
-      console.log(resultArray)
-      // if form is empty - return
-      // if (  handleCheckEmptyForm() ){
-      //     console.log('РЕТУРНУЛИСЬ')
-      //     return;
-      // }
-      console.log('hello submit form')
+      if (!canSubmit){
+        console.log('ты  НЕ ОТПРАВИЛ запрос')
+      }
       //else we send Post request
     }
 
-    const { nickNameValue, emailValue, passwordValue, passwordRepeatValue, roleValue, adminIdValue  } = loginForm;
-    const { nickNameError, emailError, passwordError, passwordRepeatError, roleError, adminIdError } = loginFormError;
-
   return (
     <>
-      <setion className='signUp'>
+      <section className='signUp'>
 
         <Preview />
 
@@ -225,15 +214,15 @@ function SignUp () {
                 name='nickname'
                 type='text'
                 value={nickNameValue} 
-                onChange={event => handleChangeLoginForm(event, 'nickNameValue', 'nickNameError')}
-                onBlur ={event => handleCheckInput(event, 'nickNameValue', 'nickNameError')}
+                onChange={event => handleChangeForm(event, 'nickNameValue', 'nickNameError')}
+                onBlur ={event => handleCheckForm(event, 'nickNameValue', 'nickNameError')}
             />
 
             { 
               nickNameError === 'empty' && <span className='signUp_error'>Enter nickname</span> 
             }
             { 
-              nickNameError === 'notValued' && <span className='signUp_error'>Incorrect nickname. Min 5 symbols, min 3 letters</span> 
+              nickNameError === 'notValid' && <span className='signUp_error'>Incorrect nickname. Min 5 symbols, min 3 letters</span> 
             }
 
             <label 
@@ -249,15 +238,15 @@ function SignUp () {
                 name='login'
                 type='email'
                 value={emailValue}
-                onChange={event => handleChangeLoginForm(event, 'emailValue', 'emailError')} 
-                onBlur ={event => handleCheckInput(event, 'emailValue', 'emailError')}
+                onChange={event => handleChangeForm(event, 'emailValue', 'emailError')} 
+                onBlur ={event => handleCheckForm(event, 'emailValue', 'emailError')}
             />
 
             { 
               emailError === 'empty' && <span className='signUp_error'>Enter email</span> 
             }
             { 
-              emailError === 'notValued' && <span className='signUp_error'>The e-mail you entered is not in the correct format. Please try again.</span> 
+              emailError === 'notValid' && <span className='signUp_error'>The e-mail you entered is not in the correct format. Please try again.</span> 
             }
 
             <label 
@@ -273,15 +262,15 @@ function SignUp () {
                 type='password'
                 name='password'
                 value={passwordValue}
-                onChange={event => handleChangeLoginForm(event, 'passwordValue', 'passwordError')}  
-                onBlur ={event => handleCheckInput(event, 'passwordValue', 'passwordError')}
+                onChange={event => handleChangeForm(event, 'passwordValue', 'passwordError')}  
+                onBlur ={event => handleCheckForm(event, 'passwordValue', 'passwordError')}
             />
 
             { 
               passwordError === 'empty' && <span className='signUp_error'>Enter password</span> 
             }
             { 
-              passwordError === 'notValued' && <span className='signUp_error'>Incorrect password. Min. 5 symbols. Min. 1 letters and min. 1 digit </span> 
+              passwordError === 'notValid' && <span className='signUp_error'>Incorrect password. Min. 5 symbols. Min. 1 letters and min. 1 digit </span> 
             }
 
             <label 
@@ -298,23 +287,23 @@ function SignUp () {
                 name='password-repeat'
                 value={passwordRepeatValue}
                 disabled={!passwordValue}
-                onChange={event => handleChangeLoginForm(event, 'passwordRepeatValue', 'passwordRepeatError')}   
-                onBlur ={event => handleCheckInput(event, 'passwordRepeatValue', 'passwordRepeatError')}
+                onChange={event => handleChangeForm(event, 'passwordRepeatValue', 'passwordRepeatError')}   
+                onBlur ={event => handleCheckForm(event, 'passwordRepeatValue', 'passwordRepeatError')}
             />
 
             { 
               passwordRepeatError === 'empty' && <span className='signUp_error'>Repeat password please</span> 
             }
             { 
-              passwordRepeatError === 'notValued' && <span className='signUp_error'>Passwords must match</span> 
+              passwordRepeatError === 'notValid' && <span className='signUp_error'>Passwords must match</span> 
             }
 
             <select
               className='signUp_select'
               name="select-role"
               value={roleValue} 
-              onChange={event => handleChangeLoginForm(event, 'roleValue', 'roleError')}
-              onBlur ={event => handleCheckInput(event, 'roleValue', 'roleError')}   
+              onChange={event => handleChangeForm(event, 'roleValue', 'roleError')}
+              onBlur ={event => handleCheckForm(event, 'roleValue', 'roleError')}   
             >
               <option  value='' disabled>
               Select a role
@@ -337,8 +326,8 @@ function SignUp () {
               className={roleValue==='user' ? 'signUp_select': 'none-active'}
               name="select-admin"
               value={adminIdValue}
-              onChange={event => handleChangeLoginForm(event, 'adminIdValue', 'adminIdError')}
-              onBlur ={event => handleCheckInput(event, 'adminIdValue', 'adminIdError')}   
+              onChange={event => handleChangeForm(event, 'adminIdValue', 'adminIdError')}
+              onBlur ={event => handleCheckForm(event, 'adminIdValue', 'adminIdError')}   
             >
               <option value='' disabled>
                 Chose admin
@@ -359,9 +348,11 @@ function SignUp () {
             }
 
             <input  
-                className='signUp_log-button'
+                // className={nickNameValue ==='' ? 'signUp_log-button-disabled' : 'signUp_log-button'}
+                className={'signUp_log-button'}
                 type='submit'
                 value='Sign Up'
+                // disabled={!nickNameValue}
             />
 
             </form>
@@ -380,7 +371,7 @@ function SignUp () {
                 </div>
 
         </div>
-      </setion>
+      </section>
     </>
   )
 }

@@ -90,6 +90,26 @@
   }
 }
 
+.signUp_log-button-disabled {
+  width: 75%;
+  font-family:$font-family-second;
+  background-color: $background-disabled;
+  border-radius: 5px;
+  border-style: none;
+  font-size: 14px;
+  color: $text-white;
+  padding: 5px;
+  font-weight: 700;
+  margin: 20px 0px 20px;
+  transition: 0.3s;
+
+  &:hover {
+    cursor: not-allowed;
+    transition: 0.4s;
+  }
+
+}
+
 .signUp-form_link {
   display: flex;
   align-items: center;

@@ -9,7 +9,7 @@ import { Preview } from '../../components'
 function SignIn () {
 
     const [loginForm, setLoginForm] = useState({nickNameValue:'', passwordValue:''})
-    // Types form Errors 'empty', 'notValued', 'notExists'
+    // Types form Errors 'empty', 'notValid', 'notExists'
     const [loginFormError, setLoginFormError] = useState({nickNameError:'', passwordError:''}) 
 
     const handleCheckEmptyInput = (loginForm, loginFormError, inputName, errorName ) => {
@@ -21,7 +21,7 @@ function SignIn () {
         return false
     }
     
-    const handleCheckEmptyForm =(event = {}, inputName = '', errorName = '') =>{
+    const handleCheckEmptyForm = (event = {}, inputName = '', errorName = '') =>{
         const loginFormCopy = {...loginForm};
         const loginFormErrorCopy = {...loginFormError};
         let resultCheckEmpty = false;
