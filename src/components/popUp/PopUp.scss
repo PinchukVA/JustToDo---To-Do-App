@@ -1,0 +1,63 @@
+@import '../../scss/Variables.scss';
+@import '../../scss/Extend.scss';
+@import '../../scss/Mixins.scss';
+
+.popUp_back {
+  background-color: $background-disabled;
+  opacity: 0.4;
+  min-width: 100%;
+  min-height: 100vh;
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popUp_wraper {
+  min-width: 100%;
+  z-index: 200;
+  position: absolute;
+  top: 35%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.popUp_block {
+  background-color: $background-main;
+  border: 1px solid $border-color-main;
+  border-radius: 15px;
+  width: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.popUp_text {
+  padding: 30px;
+  color:$text-black;
+  font-family:$font-family-second;
+  text-align: center;
+  font-size:16px;
+}
+
+.popUp_button {
+  background-color: $color-mint;
+  border-radius: 5px;
+  border: none;
+  margin: 0px 20px 20px;
+  padding: 10px 15px;
+  color:$text-white;
+  font-family:$font-family-second;
+  text-align: center;
+  font-size:14px;
+  transition: 0.3s;
+
+  &:hover {
+    background-color: $color-green;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+}

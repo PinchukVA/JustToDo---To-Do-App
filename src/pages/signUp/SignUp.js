@@ -3,6 +3,8 @@ import { Link} from 'react-router-dom';
 
 import './SignUp.scss';
 
+import { authApi } from '../../api/AuthApi'
+import { usersApi } from '../../api/UsersApi'
 import { Routes } from '../../utils/routes.js'
 import { Preview } from '../../components'
 
@@ -16,8 +18,7 @@ function SignUp () {
       roleValue:'',
       adminIdValue:''
     })
-
-    // Types form Errors 'empty', 'notValid', 'notExists', 'notRepeat'
+    // Types form Errors 'empty', 'notValid', 'exist', 'notRepeat'
     const [signUpFormError, setSignUpFormError] = useState({
       nickNameError:'',
       emailError:'', 
@@ -27,26 +28,103 @@ function SignUp () {
       adminIdError:''
     })
 
+    const [adminsList, setAdminsList] = useState([])
+
     const { nickNameValue, emailValue, passwordValue, passwordRepeatValue, roleValue, adminIdValue  } = signUpForm;
 
     const { nickNameError, emailError, passwordError, passwordRepeatError, roleError, adminIdError } = signUpFormError;
 
-    // useEffect(() => { console.log('useEffect - signUpFormError', signUpFormError) }, [signUpFormError])
+
+    async function getAdmins() {
+      try {
+        const response = await usersApi.signUpGetAdmins();
+        if (response.statusText === 'OK') {
+          let result = await response.data;
+          let resultArray = await result.slice(0, 10)
+          setAdminsList(resultArray)
+        } else {
+          throw new Error('Ошибка.Неправильный адрес запроса');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+
+    useEffect(() => { 
+      getAdmins()
+    }, [])
+
+     const renderAdminsList =  () => {
+      
+      const adminsListCopy = [...adminsList];
+
+      return(
+        adminsListCopy.map((item) => (
+          <option
+           value = {item._id}
+           key={item._id}
+          >
+              {item.userName}
+            </option> 
+        ))
+      ) 
+    }
+
+    const createAdmin = () => {
+      const signUpFormCopy = {...signUpForm};
+
+      const newAdmin = {
+        userName: signUpFormCopy.nickNameValue,
+        login: signUpFormCopy.emailValue,
+        password: signUpFormCopy.passwordValue,
+        role: signUpFormCopy.roleValue
+     }
+     return newAdmin
+    }
+
+    const createUser = () => {
+      const signUpFormCopy = {...signUpForm};
+
+      const newUser = {
+        userName: signUpFormCopy.nickNameValue,
+        login: signUpFormCopy.emailValue,
+        password: signUpFormCopy.passwordValue,
+        role: signUpFormCopy.roleValue,
+        adminId: signUpFormCopy.adminIdValue
+     }
+     return newUser
+    }
+
 
     const handleChangeForm = (event, inputName, errorName) => {
+      const { value } = event.target
       const signUpFormCopy = {...signUpForm};
       const signUpFormErrorCopy = {...signUpFormError};
 
       signUpFormErrorCopy[errorName] = '';
       setSignUpFormError(signUpFormErrorCopy)
+      
+      if ( value === 'admin') {
+        
+        signUpFormErrorCopy.adminIdError = '';
+        setSignUpFormError(signUpFormErrorCopy)
+      }
 
-      if (inputName === 'passwordValue'){
+      if (inputName === 'passwordValue') {
         signUpFormErrorCopy.passwordRepeatError = '';
         setSignUpFormError(signUpFormErrorCopy)
 
         signUpFormCopy.passwordRepeatValue = '';
         setSignUpForm(signUpFormCopy);
+      }
 
+      if (inputName === 'admin') {
+        signUpFormErrorCopy.passwordRepeatError = '';
+        setSignUpFormError(signUpFormErrorCopy)
+        signUpFormCopy.passwordRepeatValue = '';
+        setSignUpForm(signUpFormCopy);
+        
       }
 
       signUpFormCopy[inputName] = event.target.value;
@@ -59,25 +137,19 @@ function SignUp () {
         
         if (roleValue === 'user' && signUpForm[inputName] === '' ){
           signUpFormError[errorName] = 'empty'
-          return false
         }
-        return true
       }
 
       if ( signUpForm[inputName] === ''){
           signUpFormError[errorName] = 'empty'
-          console.log('проверяемся в пустом поле',signUpFormError)
-          return false
       }
-      return true
     }
 
     const handleCheckPasswordValidation = (signUpFormError) =>{
-
       const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
 
       const result = re.test(String(signUpForm.passwordValue).toLowerCase());
-      if ( !result && passwordValue !== '' ){
+      if ( !result ){
         signUpFormError.passwordError = 'notValid';
       }
       return result
@@ -92,32 +164,67 @@ function SignUp () {
       return result
     }
 
-    const handleCheckDifficultNickName = (signUpFormError) =>{
-
+    const handleCheckUserExist = async (  fieldname, fieldValue  ) =>{
+      const body = {}
+      body[fieldname] = fieldValue
+      return usersApi.checkUserExists(body)
+    } 
+    
+    const handleCheckDifficultNickName = async (signUpFormError) =>{
       const re = /(?=(?:.*[a-zA-Z]){3,})/;
-
       const result = re.test(String(signUpForm.nickNameValue).toLowerCase());
 
-      if ( nickNameValue !== ''){
-        if ( !result || ! (signUpForm.nickNameValue.length >= 5 )){
+        if ( !result || !(signUpForm.nickNameValue.length >= 5 )){
           signUpFormError.nickNameError = 'notValid';
+        } else {
+           const result = await handleCheckUserExist ( 'userName', nickNameValue)
+           if(result.data.exists){
+                signUpFormError.nickNameError = 'exist'
+                console.log('signUpFormError', signUpFormError)
+              }  
         }
-        return result
-      }
     }
 
-    const handleCheckEmailValidation = ( signUpFormError ) =>{
-
-      const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const handleCheckEmailValidation = async ( signUpFormError ) =>{
+      console.log('handleCheckEmailValidation')
+      const re = /^(([^<>()\[\]\\.,;:\s@']+(\.[^<>()\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
       const result = re.test(String(signUpForm.emailValue).toLowerCase());
 
-      if ( !result && emailValue !== '' ){
+      if ( !result){
         signUpFormError.emailError = 'notValid';
+      }else {
+        const result = await handleCheckUserExist ( 'login', emailValue )
+        if(result.data.exists){
+          signUpFormError.emailValue = 'exist'
+        }
       }
     }
 
-    const handleCheckForm = ( event = {}, inputName = '', errorName = '') => {
+
+    const handleCheckValidInput = async (inputName, signUpFormErrorCopy) => {
+      if (inputName !== ''){
+        switch (inputName){
+          case 'nickNameValue':
+            await handleCheckDifficultNickName(signUpFormErrorCopy)
+            break
+          case 'emailValue':
+            await handleCheckEmailValidation(signUpFormErrorCopy)
+            break
+          case 'passwordValue':
+            handleCheckPasswordValidation(signUpFormErrorCopy)
+            break
+          case 'passwordRepeatValue':
+            handleCheckPasswordRepeat(signUpFormErrorCopy)
+            break
+          default:
+            console.log('Input is not defined or all input are full')
+        }
+      }
+    }
+
+    
+    const handleCheckForm = async ( event = {}, inputName = '', errorName = '') => {
 
       let signUpFormCopy = {...signUpForm};
       let signUpFormErrorCopy = {...signUpFormError};
@@ -125,10 +232,7 @@ function SignUp () {
       let valuesNameForm = Object.keys (signUpFormCopy)
       let valueErrorForm = Object.keys (signUpFormErrorCopy)
 
-      handleCheckDifficultNickName(signUpFormErrorCopy)
-      handleCheckEmailValidation(signUpFormErrorCopy)
-      handleCheckPasswordValidation(signUpFormErrorCopy)
-      handleCheckPasswordRepeat(signUpFormErrorCopy)
+     await handleCheckValidInput(inputName,signUpFormErrorCopy)
 
       if ( inputName !== '' && errorName !== '' ) {
 
@@ -142,8 +246,13 @@ function SignUp () {
         setSignUpFormError(signUpFormErrorCopy)
       } 
 
+      if ( roleValue === 'admin' || roleValue === '' ){
+        valuesNameForm.pop()
+        valueErrorForm.pop()
+      }
+
       if ( inputName === '' && errorName === '' ) {
-        
+        console.log('проверка идет в этой асти кода ')
         for ( let i = 0; i < valuesNameForm.length; i++ ){
             handleCheckEmptyInput ( 
               signUpFormCopy, 
@@ -151,37 +260,42 @@ function SignUp () {
               valuesNameForm[i], 
               valueErrorForm[i]
             )
-            setSignUpFormError(signUpFormErrorCopy)
+
         }
+        setSignUpFormError(signUpFormErrorCopy)
       }
+
       let valueErrorArray = Object.values (signUpFormErrorCopy)
       let result =  valueErrorArray.every(item => item === '' )
-      console.log('handleCheckForm - могу отправить запрос?',result )
-      console.log('handleCheckForm - массив значений ошибок',valueErrorArray )
-      console.log('handleCheckForm - объект ошибок',signUpFormErrorCopy )
+
       return result
     }
 
-    const handleSubmitForm = (event) => {
+    const handleSubmitForm = async (event) => {
       event.preventDefault();
 
-      // console.log('handleSubmitFormht результат возрата ошибок',  handleCheckForm())
-      const canSubmit = handleCheckForm();
-      console.log('STATE - объект ошибок',signUpFormError )
-      const signUpFormErrorCopy = {...signUpFormError}
-      console.log('КОПИЯ - объект ошибок',signUpFormErrorCopy )
-      const valueErrors = Object.values(signUpFormErrorCopy)
-      console.log('Массив ошибок',valueErrors )
-      const canSubmitForm = valueErrors.every(item => item === '' )
-      console.log('Я могу отправить запрос?:',canSubmitForm )
+      const canSubmit = await handleCheckForm();
 
       if ( canSubmit){
-        console.log('ты ОТПРАВИЛ запрос')
+
+        if (roleValue === 'admin'){
+          let newAdmin = createAdmin()
+          authApi.signUpPostNewPerson(newAdmin)
+          console.log(' АДМИНА НОВОГО СОДАТЬ', newAdmin)
+        }
+
+        if (roleValue === 'user'){
+          let newUser = createUser()
+          authApi.signUpPostNewPerson(newUser)
+          console.log(' ЮЗЕРА СОЗДАТЬ',  newUser)
+        }
+
       }
+
       if (!canSubmit){
         console.log('ты  НЕ ОТПРАВИЛ запрос')
       }
-      //else we send Post request
+
     }
 
   return (
@@ -224,6 +338,9 @@ function SignUp () {
             { 
               nickNameError === 'notValid' && <span className='signUp_error'>Incorrect nickname. Min 5 symbols, min 3 letters</span> 
             }
+            { 
+              nickNameError === 'exist' && <span className='signUp_error'>User is already registered</span> 
+            }
 
             <label 
                 className='signUp-label' 
@@ -247,6 +364,9 @@ function SignUp () {
             }
             { 
               emailError === 'notValid' && <span className='signUp_error'>The e-mail you entered is not in the correct format. Please try again.</span> 
+            }
+            { 
+              emailError === 'exist' && <span className='signUp_error'>Email is already registered</span> 
             }
 
             <label 
@@ -300,7 +420,7 @@ function SignUp () {
 
             <select
               className='signUp_select'
-              name="select-role"
+              name='select-role'
               value={roleValue} 
               onChange={event => handleChangeForm(event, 'roleValue', 'roleError')}
               onBlur ={event => handleCheckForm(event, 'roleValue', 'roleError')}   
@@ -324,7 +444,7 @@ function SignUp () {
 
             <select
               className={roleValue==='user' ? 'signUp_select': 'none-active'}
-              name="select-admin"
+              name='select-admin'
               value={adminIdValue}
               onChange={event => handleChangeForm(event, 'adminIdValue', 'adminIdError')}
               onBlur ={event => handleCheckForm(event, 'adminIdValue', 'adminIdError')}   
@@ -333,13 +453,8 @@ function SignUp () {
                 Chose admin
               </option>
 
-              <option value = 'admin-1'>
-                Admin-1
-              </option>
+              {roleValue==='user' && renderAdminsList()}
 
-              <option value = 'admin-2'>
-                Admin-2
-              </option>
 
             </select>
 

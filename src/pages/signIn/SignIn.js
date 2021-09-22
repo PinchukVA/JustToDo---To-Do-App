@@ -5,6 +5,7 @@ import './SignIn.scss';
 
 import { Routes } from '../../utils/routes.js'
 import { Preview } from '../../components'
+import { authApi } from '../../api/AuthApi'
 
 function SignIn () {
 
@@ -51,16 +52,37 @@ function SignIn () {
         setLoginFormError(loginFormErrorCopy)
     }
 
-    const handleSubmitForm = (event) => {
+    const handleSubmitForm = async (event) => {
         event.preventDefault();
-        
+        const loginFormCopy = {...loginForm};
+
         // if form is empty - return
         if (  handleCheckEmptyForm() ){
-            console.log('РЕТУРНУЛИСЬ')
+            console.log('request not send')
             return;
         }
-        
+
+        const authUser = {
+            userName: loginFormCopy.nickNameValue,
+            password: loginFormCopy.passwordValue
+        }
         //else we send Post request
+        console.log('request send now')
+        try{
+            const res = await authApi.signInAuth(authUser)
+        }catch(error){
+            const loginFormErrorCopy = {...loginFormError};
+            const errorMessage = error.response.data.message;
+
+            if ( errorMessage === 'No user with such userName'){
+                loginFormErrorCopy['nickNameError'] = 'notExists'
+            }else if ( errorMessage === 'SignIn error' ){
+                loginFormErrorCopy['passwordError'] = 'notValid'
+            }
+
+            setLoginFormError(loginFormErrorCopy)
+        }
+        
     }
 
     const { nickNameValue,passwordValue } = loginForm;
@@ -128,7 +150,7 @@ function SignIn () {
                         passwordError === 'empty' && <span className='signIn_error'>Enter password</span> 
                     }
                     { 
-                        passwordError === 'notExists' && <span className='signIn_error'>Your password does not match. Please try again.</span>
+                        passwordError === 'notValid' && <span className='signIn_error'>Your password uncorrect. Please try again.</span>
                     }
 
                     <input  
