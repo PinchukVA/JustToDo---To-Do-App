@@ -1,0 +1,119 @@
+@import '../../scss/Variables.scss';
+@import '../../scss/Extend.scss';
+
+.signIn {
+  width: 100%;
+  max-width: 1170px;
+  margin: 40px auto;
+  display:flex;
+  justify-content:space-around;
+  align-items: center;
+}
+.signIn-form_main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+  padding: 10px 0;
+  max-width: 320px;
+  width: 100%;
+}
+
+.signIn-form_block {
+  max-width: 320px;
+  width: 100%;
+  background-color: $background-white;
+  border: 1px solid #dbdbdb;
+  border-radius: 1px;
+  margin: 10px 0px;
+  }
+
+.signIn_logo-text {
+  font-family: $font-family-main;
+  font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 10px;
+  text-align: center;
+  color:$text-black;
+}
+
+.signIn_form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.signIn-label {
+  font-family: $font-family-second;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 5px 0px;
+  margin-top:30px;
+  color:$text-black;
+}
+.signIn_input {
+      background: $background-main;
+      outline: 0;
+      overflow: hidden;
+      border: 1px solid $border-color-main;
+      padding: 5px 0 5px 10px;
+      margin: 3px 0px 5px;
+      font-size: 18px;
+      width: 70%;
+      color:$text-black;
+}
+.signIn_logIn-button {
+  width: 75%;
+  font-family:$font-family-second;
+  background-color: $color-mint;
+  border-radius: 5px;
+  border-style: none;
+  font-size: 14px;
+  color: $text-white;
+  padding: 5px;
+  font-weight: 700;
+  margin: 20px 0px 20px;
+  transition: 0.3s;
+
+  &:hover {
+    cursor: pointer;
+    background-color: $color-green;
+    transition: 0.3s;
+  }
+}
+.signIn-form_link {
+  display: flex;
+  align-items: center;
+  justify-content:space-around;
+  max-width: 320px;
+  width: 100%;
+  background-color: $background-white;
+  border: 1px solid $border-color-main;
+  border-radius: 1px;
+  margin: 10px 0px;
+}
+.signIn_text {
+  font-family: $font-family-second;
+  font-size: 14px;
+  font-weight: 400;
+  color:$text-black;
+}
+.signIn_link-text {
+  font-family: $font-family-second;
+  font-size: 14px;
+  font-weight: 700;
+  color:$color-mint;
+  text-decoration: none;
+  transition: 0.3s;
+
+  &:hover {
+    text-decoration: none;
+    cursor: pointer;
+    color: $color-green;
+    transition: 0.3s;
+  }
+}
+
+.signIn_error {
+    @extend %typeError;
+}
