@@ -1,0 +1,74 @@
+@import '../../scss/Variables.scss';
+@import '../../scss/Extend.scss';
+@import '../../scss/Mixins.scss';
+
+.auth-label {
+  font-family: $font-family-second;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 5px 0px;
+  margin-top:10px;
+  color:$text-black;
+  display: inline-block;
+  width: 70%;
+}
+
+.auth-label-disabled{
+  font-family: $font-family-second;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 5px 0px;
+  margin-top:10px;
+  color:$text-black;
+  display: inline-block;
+  width: 70%;
+  opacity: 0.3;
+}
+.auth_input {
+  @include form-input;
+}
+.auth_input-disabled {
+  @include form-input;
+  opacity: 0.3;
+  background-color: $background-disabled;
+}
+
+.auth_log-button {
+  width: 75%;
+  font-family:$font-family-second;
+  background-color: $color-mint;
+  border-radius: 5px;
+  border-style: none;
+  font-size: 14px;
+  color: $text-white;
+  padding: 5px;
+  font-weight: 700;
+  margin: 20px 0px 20px;
+  transition: 0.3s;
+
+  &:hover {
+    cursor: pointer;
+    background-color: $color-green;
+    transition: 0.3s;
+  }
+}
+
+.auth_error {
+    @extend %typeError;
+}
+
+.auth_select {
+  background: $background-main;
+  outline: 0;
+  overflow: hidden;
+  border: 1px solid $border-color-main;
+  padding: 5px 0 5px 10px;
+  margin: 10px 0px 5px;
+  font-size: 16px;
+  width: 74%;
+  color:$text-black;
+}
+
+.none-active {
+  display:none;
+}

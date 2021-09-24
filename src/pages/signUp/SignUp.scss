@@ -1,0 +1,75 @@
+@import '../../scss/Variables.scss';
+@import '../../scss/Extend.scss';
+@import '../../scss/Mixins.scss';
+
+.signUp {
+  width: 100%;
+  max-width: 1170px;
+  margin: 40px auto;
+  display:flex;
+  justify-content:space-around;
+  align-items: center;
+}
+
+.signUp-form_main {
+  @include main-form;
+}
+
+.signUp-form_block {
+  @include main-form-block;
+  margin: 5px 0px;
+}
+
+.signUp_logo-text {
+  font-family: $font-family-main;
+  font-size: 28px;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 10px;
+  text-align: center;
+  color:$color-mint;
+  margin: 10px 0px;
+}
+
+.signUp_form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.signUp-form_link {
+  display: flex;
+  align-items: center;
+  justify-content:space-around;
+  max-width: 320px;
+  width: 100%;
+  background-color: $background-white;
+  border: 1px solid $border-color-main;
+  border-radius: 1px;
+  margin: 5px 0px;
+}
+
+.signUp_text {
+  font-family: $font-family-second;
+  font-size: 16px;
+  font-weight: 400;
+  color:$text-black;
+  text-align: center;
+  padding: 0px 40px;
+}
+
+.signUp_link-text {
+  font-family: $font-family-second;
+  font-size: 16px;
+  font-weight: 700;
+  color:$color-mint;
+  text-decoration: none;
+  transition: 0.3s;
+
+  &:hover {
+    text-decoration: none;
+    cursor: pointer;
+    color: $color-green;
+    transition: 0.3s;
+  }
+}

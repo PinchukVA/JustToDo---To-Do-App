@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link} from 'react-router-dom';
 
 import './SignIn.scss';
 
 import { Routes } from '../../utils/routes.js'
-import { Preview } from '../../components'
+import { authApi } from '../../api/AuthApi'
+import { 
+    Preview,
+    AuthInput, 
+    AuthButtonSubmit 
+} from '../../components'
 
 function SignIn () {
 
-    const [loginForm, setLoginForm] = useState({loginValue:'', passwordValue:''})
-    // Types form Errors 'empty', 'notValued', 'notExists'
-    const [loginFormError, setLoginFormError] = useState({loginError:'', passwordError:''}) 
+    const [loginForm, setLoginForm] = useState({nickNameValue:'', passwordValue:''})
+    // Types form Errors 'empty', 'notValid', 'Exist'
+    const [loginFormError, setLoginFormError] = useState({nickNameError:'', passwordError:''}) 
 
     const handleCheckEmptyInput = (loginForm, loginFormError, inputName, errorName ) => {
         if ( loginForm[inputName] === ''){
@@ -20,21 +25,8 @@ function SignIn () {
         
         return false
     }
-    const handleCheckEmailValidation = () =>{
-         const loginFormErrorCopy = {...loginFormError}
-         const loginFormCopy = {...loginForm}
-         const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-         const result = re.test(String(loginFormCopy.loginValue).toLowerCase());
-
-         if ( !result ){
-            loginFormErrorCopy.loginError = 'notValued';
-            setLoginFormError(loginFormErrorCopy);
-         }
-         
-         return result
-    }
-
-    const handleCheckEmptyForm =(event = {}, inputName = '', errorName = '') =>{
+    
+    const handleCheckEmptyForm = (event = {}, inputName = '', errorName = '') =>{
         const loginFormCopy = {...loginForm};
         const loginFormErrorCopy = {...loginFormError};
         let resultCheckEmpty = false;
@@ -46,7 +38,7 @@ function SignIn () {
             resultCheckEmpty = handleCheckEmptyInput (loginFormCopy, loginFormErrorCopy, inputName, errorName)
             setLoginFormError(loginFormErrorCopy)
         } else {
-            resultCheckEmptyLogin = handleCheckEmptyInput (loginFormCopy, loginFormErrorCopy, 'loginValue', 'loginError')
+            resultCheckEmptyLogin = handleCheckEmptyInput (loginFormCopy, loginFormErrorCopy, 'nickNameValue', 'nickNameError')
             resultCheckEmptyPassword = handleCheckEmptyInput (loginFormCopy, loginFormErrorCopy, 'passwordValue', 'passwordError')
             resultCheckEmpty = resultCheckEmptyLogin || resultCheckEmptyPassword
 
@@ -64,20 +56,44 @@ function SignIn () {
         setLoginFormError(loginFormErrorCopy)
     }
 
-    const handleSubmitForm = (event) => {
+    const handleSubmitForm = async (event) => {
         event.preventDefault();
-        
+        const loginFormCopy = {...loginForm};
+
         // if form is empty - return
-        if (  handleCheckEmptyForm() || !handleCheckEmailValidation() ){
-            console.log('РЕТУРНУЛИСЬ')
+        if (  handleCheckEmptyForm() ){
+            console.log('request not send')
             return;
         }
-        
+
+        const authUser = {
+            userName: loginFormCopy.nickNameValue,
+            password: loginFormCopy.passwordValue
+        }
         //else we send Post request
+        console.log('request send now')
+        try{
+            const res = await authApi.signInAuth(authUser)
+            const token = res.data.token
+            document.cookie = 'jwt' + '=' + token
+
+        }catch(error){
+            const loginFormErrorCopy = {...loginFormError};
+            const errorMessage = error.response.data.message;
+
+            if ( errorMessage === 'No user with such userName'){
+                loginFormErrorCopy['nickNameError'] = 'exist'
+            }else if ( errorMessage === 'Passwords did not match' ){
+                loginFormErrorCopy['passwordError'] = 'notValid'
+            }
+
+            setLoginFormError(loginFormErrorCopy)
+        }
+        
     }
 
-    const { loginValue,passwordValue } = loginForm;
-    const { loginError,passwordError } = loginFormError;
+    const { nickNameValue,passwordValue } = loginForm;
+    const { nickNameError,passwordError } = loginFormError;
 
     return (
         <>
@@ -96,62 +112,40 @@ function SignIn () {
                         noValidate
                     >
 
-                    <label 
-                        className='signIn-label' 
-                        htmlFor='signIn-e-mail'
-                    >
-                        e-mail
-                    </label>
-
-                    <input
-                        className='signIn_input'
-                        id='signIn-e-mail'
-                        name='login'
-                        type='email' 
-                        value={loginValue}
-                        onChange={event => handleChangeLoginForm(event, 'loginValue', 'loginError')}
-                        onBlur ={event => handleCheckEmptyForm(event, 'loginValue', 'loginError')}
+                    < AuthInput 
+                        labelText = 'Nickname'
+                        inputName = 'nickname'
+                        inputType ='text'
+                        inputValue = {nickNameValue}  
+                        idInput = '1'
+                        onChange ={event => handleChangeLoginForm(event, 'nickNameValue', 'nickNameError')}
+                        onBlur = {event => handleCheckEmptyForm(event, 'nickNameValue', 'nickNameError')}
+                        inputNameError = {nickNameError}
+                        inputTextErrorEmpty = 'Enter nickname'
+                        inputTextErrorNotValid = ''
+                        inputTextErrorExist = 'User is not found'
+                        disabledValue = {false}
                     />
 
-                    { 
-                        loginError === 'empty' && <span className='signIn_error'>Enter login</span> 
-                    }
-                    { 
-                        loginError === 'notValued' && <span className='signIn_error'>The email you entered is not in the correct format. Please check.</span> 
-                    }
-                    { 
-                        loginError === 'notExists' && <span className='signIn_error'>User is not found</span>
-                    }
-
-                    <label 
-                        className='signIn-label' 
-                        htmlFor='signIn-password'
-                    >
-                        Password
-                    </label>
-
-                    <input
-                        className='signIn_input'
-                        id='signIn-password'
-                        type='password'
-                        name='password'
-                        value={passwordValue}
-                        onChange={event => handleChangeLoginForm(event, 'passwordValue', 'passwordError')}
-                        onBlur ={event => handleCheckEmptyForm(event, 'passwordValue', 'passwordError')}
+                    < AuthInput 
+                        labelText = 'Password'
+                        inputName = 'password'
+                        inputType ='password'
+                        inputValue = {passwordValue}  
+                        idInput = '2'
+                        onChange ={event => handleChangeLoginForm(event, 'passwordValue', 'passwordError')}
+                        onBlur = {event => handleCheckEmptyForm(event, 'passwordValue', 'passwordError')}
+                        inputNameError = {passwordError}
+                        inputTextErrorEmpty = 'Enter password'
+                        inputTextErrorNotValid = 'Your password uncorrect. Please try again.'
+                        inputTextErrorExist = ''
+                        disabledValue = {false}
                     />
 
-                    { 
-                        passwordError === 'empty' && <span className='signIn_error'>Enter password</span> 
-                    }
-                    { 
-                        passwordError === 'notExists' && <span className='signIn_error'>Your password does not match. Please try again.</span>
-                    }
-
-                    <input  
-                        className='signIn_logIn-button'
-                        type='submit'
-                        value='Log In'
+                    <AuthButtonSubmit 
+                        value = 'Log In'
                     />
+
                     </form>
 
                 </div>
