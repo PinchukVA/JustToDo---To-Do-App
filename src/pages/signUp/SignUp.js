@@ -6,7 +6,13 @@ import './SignUp.scss';
 import { authApi } from '../../api/AuthApi'
 import { usersApi } from '../../api/UsersApi'
 import { Routes } from '../../utils/routes.js'
-import { Preview } from '../../components'
+import { 
+  Preview, 
+  PopUpLink, 
+  AuthInput, 
+  AuthSelect, 
+  AuthButtonSubmit 
+} from '../../components'
 
 function SignUp () {
 
@@ -29,6 +35,19 @@ function SignUp () {
     })
 
     const [adminsList, setAdminsList] = useState([])
+    const [linkText, setLinkText] = useState('')
+    const [okSignUp, setOkSignUp] = useState(false)
+
+    const optionSelect = [
+      {
+        _id:1,
+        option: 'user'
+      },
+      {
+        _id:2,
+        option: 'admin'
+      }
+    ]
 
     const { nickNameValue, emailValue, passwordValue, passwordRepeatValue, roleValue, adminIdValue  } = signUpForm;
 
@@ -40,10 +59,12 @@ function SignUp () {
         const response = await usersApi.signUpGetAdmins();
         if (response.statusText === 'OK') {
           let result = await response.data;
-          let resultArray = await result.slice(0, 10)
+          let resultArray = await result
+          console.log('getAdmins',result )
+          console.log('getAdmins',resultArray )
           setAdminsList(resultArray)
         } else {
-          throw new Error('Ошибка.Неправильный адрес запроса');
+          throw new Error('Error. Uncorect HTTP request ');
         }
       } catch (error) {
         console.error(error);
@@ -55,22 +76,6 @@ function SignUp () {
       getAdmins()
     }, [])
 
-     const renderAdminsList =  () => {
-      
-      const adminsListCopy = [...adminsList];
-
-      return(
-        adminsListCopy.map((item) => (
-          <option
-           value = {item._id}
-           key={item._id}
-          >
-              {item.userName}
-            </option> 
-        ))
-      ) 
-    }
-
     const createAdmin = () => {
       const signUpFormCopy = {...signUpForm};
 
@@ -80,22 +85,59 @@ function SignUp () {
         password: signUpFormCopy.passwordValue,
         role: signUpFormCopy.roleValue
      }
+     console.log('createAdmin object is -  ',newAdmin)
      return newAdmin
     }
 
     const createUser = () => {
       const signUpFormCopy = {...signUpForm};
+      const adminsListCopy = [...adminsList];
+      const idAdmin = adminsListCopy.find(item => item.userName === signUpFormCopy.adminIdValue);
 
       const newUser = {
         userName: signUpFormCopy.nickNameValue,
         login: signUpFormCopy.emailValue,
         password: signUpFormCopy.passwordValue,
         role: signUpFormCopy.roleValue,
-        adminId: signUpFormCopy.adminIdValue
+        adminId: idAdmin._id
      }
+
      return newUser
     }
 
+    const sendRequest = async (user) =>{
+
+      const signUpFormCopy = {...signUpForm};
+      let createNewUser 
+      const clearState = {
+        nickNameValue:'',
+        emailValue:'', 
+        passwordValue:'', 
+        passwordRepeatValue:'',  
+        roleValue:'',
+        adminIdValue:''
+      }
+      const userNick = signUpFormCopy.nickNameValue
+
+      if ( user === 'admin') {
+        createNewUser = createAdmin()
+      }
+
+      if ( user === 'user') {
+        createNewUser = createUser()
+      } 
+
+      const res = await authApi.signUpPostNewPerson(createNewUser)
+      console.log(res)
+      console.log('new person is created', createNewUser)
+
+      if ( res.statusText === 'Created'){
+        setOkSignUp(true)
+        setLinkText(` "${userNick}'' is successfully registered. Please log in ` )
+        setSignUpForm(clearState)
+      }
+
+    }
 
     const handleChangeForm = (event, inputName, errorName) => {
       const { value } = event.target
@@ -106,7 +148,7 @@ function SignUp () {
       setSignUpFormError(signUpFormErrorCopy)
       
       if ( value === 'admin') {
-        
+        signUpFormCopy.adminIdValue = ''
         signUpFormErrorCopy.adminIdError = '';
         setSignUpFormError(signUpFormErrorCopy)
       }
@@ -119,20 +161,11 @@ function SignUp () {
         setSignUpForm(signUpFormCopy);
       }
 
-      if (inputName === 'admin') {
-        signUpFormErrorCopy.passwordRepeatError = '';
-        setSignUpFormError(signUpFormErrorCopy)
-        signUpFormCopy.passwordRepeatValue = '';
-        setSignUpForm(signUpFormCopy);
-        
-      }
-
       signUpFormCopy[inputName] = event.target.value;
       setSignUpForm(signUpFormCopy);
     }
 
     const handleCheckEmptyInput = ( signUpForm, signUpFormError, inputName= '', errorName = '' ) => {
-
       if (inputName === 'adminIdValue' ){
         
         if (roleValue === 'user' && signUpForm[inputName] === '' ){
@@ -186,7 +219,6 @@ function SignUp () {
     }
 
     const handleCheckEmailValidation = async ( signUpFormError ) =>{
-      console.log('handleCheckEmailValidation')
       const re = /^(([^<>()\[\]\\.,;:\s@']+(\.[^<>()\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
       const result = re.test(String(signUpForm.emailValue).toLowerCase());
@@ -201,9 +233,10 @@ function SignUp () {
       }
     }
 
-
     const handleCheckValidInput = async (inputName, signUpFormErrorCopy) => {
+
       if (inputName !== ''){
+        console.log('handleCheckValidInput - deep cheeck', inputName, signUpFormErrorCopy)
         switch (inputName){
           case 'nickNameValue':
             await handleCheckDifficultNickName(signUpFormErrorCopy)
@@ -223,9 +256,7 @@ function SignUp () {
       }
     }
 
-    
     const handleCheckForm = async ( event = {}, inputName = '', errorName = '') => {
-
       let signUpFormCopy = {...signUpForm};
       let signUpFormErrorCopy = {...signUpFormError};
 
@@ -252,7 +283,6 @@ function SignUp () {
       }
 
       if ( inputName === '' && errorName === '' ) {
-        console.log('проверка идет в этой асти кода ')
         for ( let i = 0; i < valuesNameForm.length; i++ ){
             handleCheckEmptyInput ( 
               signUpFormCopy, 
@@ -275,35 +305,28 @@ function SignUp () {
       event.preventDefault();
 
       const canSubmit = await handleCheckForm();
+      let signUpFormCopy = {...signUpForm};
 
-      if ( canSubmit){
-
-        if (roleValue === 'admin'){
-          let newAdmin = createAdmin()
-          authApi.signUpPostNewPerson(newAdmin)
-          console.log(' АДМИНА НОВОГО СОДАТЬ', newAdmin)
-        }
-
-        if (roleValue === 'user'){
-          let newUser = createUser()
-          authApi.signUpPostNewPerson(newUser)
-          console.log(' ЮЗЕРА СОЗДАТЬ',  newUser)
-        }
-
-      }
-
-      if (!canSubmit){
+      if ( !canSubmit){
         console.log('ты  НЕ ОТПРАВИЛ запрос')
+        return
       }
-
+      
+       await sendRequest(signUpFormCopy.roleValue)
+        
     }
-
+  
   return (
     <>
       <section className='signUp'>
 
         <Preview />
-
+        {okSignUp && <PopUpLink 
+          text = {linkText}
+          buttonText = 'Sign in'
+          link = 'SignInRoute'
+        />}
+        
         <div className='signUp-form_main'>
 
           <div className='signUp-form_block' >
@@ -315,159 +338,93 @@ function SignUp () {
                 noValidate
                 onSubmit = {handleSubmitForm}
             >
-              <label 
-                className='signUp-label' 
-                htmlFor='signUp-nickname'
-            >
-                Nickname
-            </label>
 
-            <input
-                className='signUp_input'
-                id='signUp-nickname'
-                name='nickname'
-                type='text'
-                value={nickNameValue} 
-                onChange={event => handleChangeForm(event, 'nickNameValue', 'nickNameError')}
-                onBlur ={event => handleCheckForm(event, 'nickNameValue', 'nickNameError')}
-            />
+              < AuthInput 
+                labelText = 'Nickname'
+                inputName = 'nickname'
+                inputType ='text'
+                inputValue = {nickNameValue}  
+                idInput = '1'
+                onChange ={event => handleChangeForm(event, 'nickNameValue', 'nickNameError')}
+                onBlur = {event => handleCheckForm(event, 'nickNameValue', 'nickNameError')}
+                inputNameError = {nickNameError}
+                inputTextErrorEmpty = 'Enter nickname'
+                inputTextErrorNotValid = 'Incorrect nickname. Min 5 symbols, min 3 letters'
+                inputTextErrorExist = 'User is already registered'
+                disabledValue = {false}
+              />
 
-            { 
-              nickNameError === 'empty' && <span className='signUp_error'>Enter nickname</span> 
-            }
-            { 
-              nickNameError === 'notValid' && <span className='signUp_error'>Incorrect nickname. Min 5 symbols, min 3 letters</span> 
-            }
-            { 
-              nickNameError === 'exist' && <span className='signUp_error'>User is already registered</span> 
-            }
+             < AuthInput 
+                labelText = 'e-mail'
+                inputName = 'login'
+                inputType ='email'
+                inputValue = {emailValue}  
+                idInput = '2'
+                onChange ={event => handleChangeForm(event, 'emailValue', 'emailError')}
+                onBlur = {event => handleCheckForm(event, 'emailValue', 'emailError')}
+                inputNameError = {emailError}
+                inputTextErrorEmpty = 'Enter email'
+                inputTextErrorNotValid = 'The e-mail you entered is not in the correct format. Please try again'
+                inputTextErrorExist = 'Email is already registered'
+                disabledValue ={false}
+              />
 
-            <label 
-                className='signUp-label' 
-                htmlFor='signUp-e-mail'
-            >
-                e-mail
-            </label>
+            < AuthInput 
+                labelText = 'Password'
+                inputName = 'password'
+                inputType ='password'
+                inputValue = {passwordValue}  
+                idInput = '3'
+                onChange ={event => handleChangeForm(event, 'passwordValue', 'passwordError')}
+                onBlur = {event => handleCheckForm(event, 'passwordValue', 'passwordError')}
+                inputNameError = {passwordError}
+                inputTextErrorEmpty = 'Enter password'
+                inputTextErrorNotValid = 'Incorrect password. Min. 5 symbols. Min. 1 letters and min. 1 digit '
+                inputTextErrorExist = ''
+                disabledValue = {false}
+              />
 
-            <input
-                className='signUp_input'
-                id='signUp-e-mail'
-                name='login'
-                type='email'
-                value={emailValue}
-                onChange={event => handleChangeForm(event, 'emailValue', 'emailError')} 
-                onBlur ={event => handleCheckForm(event, 'emailValue', 'emailError')}
-            />
+            < AuthInput 
+                labelText = 'Repeat password'
+                inputName = 'password-repeat'
+                inputType ='password'
+                inputValue = {passwordRepeatValue}  
+                idInput = '4'
+                onChange ={event => handleChangeForm(event, 'passwordRepeatValue', 'passwordRepeatError')}
+                onBlur = {event => handleCheckForm(event, 'passwordRepeatValue', 'passwordRepeatError')}
+                inputNameError = {passwordRepeatError}
+                inputTextErrorEmpty = 'Repeat password please'
+                inputTextErrorNotValid = 'Passwords must match '
+                inputTextErrorExist = ''
+                disabledValue = {!passwordValue}
+              />
 
-            { 
-              emailError === 'empty' && <span className='signUp_error'>Enter email</span> 
-            }
-            { 
-              emailError === 'notValid' && <span className='signUp_error'>The e-mail you entered is not in the correct format. Please try again.</span> 
-            }
-            { 
-              emailError === 'exist' && <span className='signUp_error'>Email is already registered</span> 
-            }
+              < AuthSelect 
+                selectName = 'select-role'
+                selectValue = {roleValue}
+                onChange ={event => handleChangeForm(event, 'roleValue', 'roleError')}
+                onBlur = {event => handleCheckForm(event, 'roleValue', 'roleError')}
+                selectErrorName = {roleError}
+                selectDefaultText = 'Select a role'
+                optionList = {optionSelect}
+                selectErrorText = 'Chose role please'
+                disabledValue = {true}
+              />
 
-            <label 
-                className='signUp-label' 
-                htmlFor='signUp-password'
-            >
-                Password
-            </label>
-
-            <input
-                className='signUp_input'
-                id='signUp-password'
-                type='password'
-                name='password'
-                value={passwordValue}
-                onChange={event => handleChangeForm(event, 'passwordValue', 'passwordError')}  
-                onBlur ={event => handleCheckForm(event, 'passwordValue', 'passwordError')}
-            />
-
-            { 
-              passwordError === 'empty' && <span className='signUp_error'>Enter password</span> 
-            }
-            { 
-              passwordError === 'notValid' && <span className='signUp_error'>Incorrect password. Min. 5 symbols. Min. 1 letters and min. 1 digit </span> 
-            }
-
-            <label 
-                className={passwordValue==='' ? 'signUp-label-disabled'  : 'signUp-label'}
-                htmlFor='signUp-password-repeat'
-            >
-                Repeat password
-            </label>
-
-            <input
-                className={passwordValue==='' ? 'signUp_input-disabled' : 'signUp_input'}
-                id='signUp-password-repeat'
-                type='password'
-                name='password-repeat'
-                value={passwordRepeatValue}
-                disabled={!passwordValue}
-                onChange={event => handleChangeForm(event, 'passwordRepeatValue', 'passwordRepeatError')}   
-                onBlur ={event => handleCheckForm(event, 'passwordRepeatValue', 'passwordRepeatError')}
-            />
-
-            { 
-              passwordRepeatError === 'empty' && <span className='signUp_error'>Repeat password please</span> 
-            }
-            { 
-              passwordRepeatError === 'notValid' && <span className='signUp_error'>Passwords must match</span> 
-            }
-
-            <select
-              className='signUp_select'
-              name='select-role'
-              value={roleValue} 
-              onChange={event => handleChangeForm(event, 'roleValue', 'roleError')}
-              onBlur ={event => handleCheckForm(event, 'roleValue', 'roleError')}   
-            >
-              <option  value='' disabled>
-              Select a role
-              </option>
-
-              <option value='user'>
-                User
-              </option>
-
-              <option value='admin'>
-                Admin
-              </option>
-            </select>
-
-            { 
-              roleError === 'empty' && <span className='signUp_error'>Chose role please</span> 
-            }
-
-            <select
-              className={roleValue==='user' ? 'signUp_select': 'none-active'}
-              name='select-admin'
-              value={adminIdValue}
-              onChange={event => handleChangeForm(event, 'adminIdValue', 'adminIdError')}
-              onBlur ={event => handleCheckForm(event, 'adminIdValue', 'adminIdError')}   
-            >
-              <option value='' disabled>
-                Chose admin
-              </option>
-
-              {roleValue==='user' && renderAdminsList()}
-
-
-            </select>
-
-            { 
-              adminIdError === 'empty' && <span className='signUp_error'>Chose admin please</span> 
-            }
-
-            <input  
-                // className={nickNameValue ==='' ? 'signUp_log-button-disabled' : 'signUp_log-button'}
-                className={'signUp_log-button'}
-                type='submit'
-                value='Sign Up'
-                // disabled={!nickNameValue}
+              < AuthSelect 
+                selectName = 'select-admin'
+                selectValue = {adminIdValue}
+                onChange ={event => handleChangeForm(event, 'adminIdValue', 'adminIdError')}
+                onBlur = {event => handleCheckForm(event, 'adminIdValue', 'adminIdError')}
+                selectErrorName = {adminIdError}
+                selectDefaultText = 'Chose admin'
+                optionList = {adminsList}
+                selectErrorText = 'Chose admin please'
+                disabledValue = {roleValue === 'user' }
+              />
+            
+            <AuthButtonSubmit 
+              value = 'Sign Up'
             />
 
             </form>

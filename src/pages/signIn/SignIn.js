@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link} from 'react-router-dom';
 
 import './SignIn.scss';
 
 import { Routes } from '../../utils/routes.js'
-import { Preview } from '../../components'
 import { authApi } from '../../api/AuthApi'
+import { 
+    Preview,
+    AuthInput, 
+    AuthButtonSubmit 
+} from '../../components'
 
 function SignIn () {
 
     const [loginForm, setLoginForm] = useState({nickNameValue:'', passwordValue:''})
-    // Types form Errors 'empty', 'notValid', 'notExists'
+    // Types form Errors 'empty', 'notValid', 'Exist'
     const [loginFormError, setLoginFormError] = useState({nickNameError:'', passwordError:''}) 
 
     const handleCheckEmptyInput = (loginForm, loginFormError, inputName, errorName ) => {
@@ -70,13 +74,16 @@ function SignIn () {
         console.log('request send now')
         try{
             const res = await authApi.signInAuth(authUser)
+            console.log('get OK request', res)
+            const token = res.data.token
+            console.log('get OK request', token)
         }catch(error){
             const loginFormErrorCopy = {...loginFormError};
             const errorMessage = error.response.data.message;
 
             if ( errorMessage === 'No user with such userName'){
-                loginFormErrorCopy['nickNameError'] = 'notExists'
-            }else if ( errorMessage === 'SignIn error' ){
+                loginFormErrorCopy['nickNameError'] = 'exist'
+            }else if ( errorMessage === 'Passwords did not match' ){
                 loginFormErrorCopy['passwordError'] = 'notValid'
             }
 
@@ -105,59 +112,40 @@ function SignIn () {
                         noValidate
                     >
 
-                    <label 
-                        className='signIn-label' 
-                        htmlFor='signIn-e-mail'
-                    >
-                        Nickname
-                    </label>
-
-                    <input
-                        className='signIn_input'
-                        id='signIn-e-mail'
-                        name='login'
-                        type='text' 
-                        value={nickNameValue}
-                        onChange={event => handleChangeLoginForm(event, 'nickNameValue', 'nickNameError')}
-                        onBlur ={event => handleCheckEmptyForm(event, 'nickNameValue', 'nickNameError')}
+                    < AuthInput 
+                        labelText = 'Nickname'
+                        inputName = 'nickname'
+                        inputType ='text'
+                        inputValue = {nickNameValue}  
+                        idInput = '1'
+                        onChange ={event => handleChangeLoginForm(event, 'nickNameValue', 'nickNameError')}
+                        onBlur = {event => handleCheckEmptyForm(event, 'nickNameValue', 'nickNameError')}
+                        inputNameError = {nickNameError}
+                        inputTextErrorEmpty = 'Enter nickname'
+                        inputTextErrorNotValid = ''
+                        inputTextErrorExist = 'User is not found'
+                        disabledValue = {false}
                     />
 
-                    { 
-                        nickNameError === 'empty' && <span className='signIn_error'>Enter nickname</span> 
-                    }
-                    { 
-                        nickNameError === 'notExists' && <span className='signIn_error'>User is not found</span>
-                    }
-
-                    <label 
-                        className='signIn-label' 
-                        htmlFor='signIn-password'
-                    >
-                        Password
-                    </label>
-
-                    <input
-                        className='signIn_input'
-                        id='signIn-password'
-                        type='password'
-                        name='password'
-                        value={passwordValue}
-                        onChange={event => handleChangeLoginForm(event, 'passwordValue', 'passwordError')}
-                        onBlur ={event => handleCheckEmptyForm(event, 'passwordValue', 'passwordError')}
+                    < AuthInput 
+                        labelText = 'Password'
+                        inputName = 'password'
+                        inputType ='password'
+                        inputValue = {passwordValue}  
+                        idInput = '2'
+                        onChange ={event => handleChangeLoginForm(event, 'passwordValue', 'passwordError')}
+                        onBlur = {event => handleCheckEmptyForm(event, 'passwordValue', 'passwordError')}
+                        inputNameError = {passwordError}
+                        inputTextErrorEmpty = 'Enter password'
+                        inputTextErrorNotValid = 'Your password uncorrect. Please try again.'
+                        inputTextErrorExist = ''
+                        disabledValue = {false}
                     />
 
-                    { 
-                        passwordError === 'empty' && <span className='signIn_error'>Enter password</span> 
-                    }
-                    { 
-                        passwordError === 'notValid' && <span className='signIn_error'>Your password uncorrect. Please try again.</span>
-                    }
-
-                    <input  
-                        className='signIn_logIn-button'
-                        type='submit'
-                        value='Log In'
+                    <AuthButtonSubmit 
+                        value = 'Log In'
                     />
+
                     </form>
 
                 </div>

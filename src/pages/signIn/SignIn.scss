@@ -33,36 +33,7 @@
   flex-direction: column;
   align-items: center;
 }
-.signIn-label {
-  font-family: $font-family-second;
-  font-size: 12px;
-  font-weight: 400;
-  padding: 5px 0px;
-  margin-top:30px;
-  color:$text-black;
-}
-.signIn_input {
-  @include form-input;
-}
-.signIn_logIn-button {
-  width: 75%;
-  font-family:$font-family-second;
-  background-color: $color-mint;
-  border-radius: 5px;
-  border-style: none;
-  font-size: 14px;
-  color: $text-white;
-  padding: 5px;
-  font-weight: 700;
-  margin: 20px 0px 20px;
-  transition: 0.3s;
 
-  &:hover {
-    cursor: pointer;
-    background-color: $color-green;
-    transition: 0.3s;
-  }
-}
 .signIn-form_link {
   display: flex;
   align-items: center;
@@ -94,8 +65,4 @@
     color: $color-green;
     transition: 0.3s;
   }
-}
-
-.signIn_error {
-    @extend %typeError;
 }

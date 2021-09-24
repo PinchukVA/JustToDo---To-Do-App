@@ -13,7 +13,6 @@
 
 .signUp-form_main {
   @include main-form;
-  
 }
 
 .signUp-form_block {
@@ -36,78 +35,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.signUp-label {
-  font-family: $font-family-second;
-  font-size: 12px;
-  font-weight: 400;
-  padding: 5px 0px;
-  margin-top:10px;
-  color:$text-black;
-  display: inline-block;
-  width: 70%;
-}
-
-.signUp-label-disabled{
-  font-family: $font-family-second;
-  font-size: 12px;
-  font-weight: 400;
-  padding: 5px 0px;
-  margin-top:10px;
-  color:$text-black;
-  display: inline-block;
-  width: 70%;
-  opacity: 0.3;
-}
-.signUp_input {
-  @include form-input;
-}
-
-.signUp_input-disabled {
-  @include form-input;
-  opacity: 0.3;
-  background-color: $background-disabled;
-}
-
-.signUp_log-button {
-  width: 75%;
-  font-family:$font-family-second;
-  background-color: $color-mint;
-  border-radius: 5px;
-  border-style: none;
-  font-size: 14px;
-  color: $text-white;
-  padding: 5px;
-  font-weight: 700;
-  margin: 20px 0px 20px;
-  transition: 0.3s;
-
-  &:hover {
-    cursor: pointer;
-    background-color: $color-green;
-    transition: 0.3s;
-  }
-}
-
-.signUp_log-button-disabled {
-  width: 75%;
-  font-family:$font-family-second;
-  background-color: $background-disabled;
-  border-radius: 5px;
-  border-style: none;
-  font-size: 14px;
-  color: $text-white;
-  padding: 5px;
-  font-weight: 700;
-  margin: 20px 0px 20px;
-  transition: 0.3s;
-
-  &:hover {
-    cursor: not-allowed;
-    transition: 0.4s;
-  }
-
 }
 
 .signUp-form_link {
@@ -145,24 +72,4 @@
     color: $color-green;
     transition: 0.3s;
   }
-}
-
-.signUp_error {
-    @extend %typeError;
-}
-
-.signUp_select {
-  background: $background-main;
-  outline: 0;
-  overflow: hidden;
-  border: 1px solid $border-color-main;
-  padding: 5px 0 5px 10px;
-  margin: 10px 0px 5px;
-  font-size: 16px;
-  width: 74%;
-  color:$text-black;
-}
-
-.none-active {
-  display:none;
 }

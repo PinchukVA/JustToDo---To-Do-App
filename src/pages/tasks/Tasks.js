@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { PopUp } from '../../components'
+import { PopUpLink } from '../../components'
 
 function Tasks () {
   return (
     <>
       <h1> Страница Заданий</h1>
-      <PopUp />
+      <PopUpLink />
     </>
   )
 }
