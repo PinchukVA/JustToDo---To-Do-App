@@ -74,9 +74,9 @@ function SignIn () {
         console.log('request send now')
         try{
             const res = await authApi.signInAuth(authUser)
-            console.log('get OK request', res)
             const token = res.data.token
-            console.log('get OK request', token)
+            document.cookie = 'jwt' + '=' + token
+
         }catch(error){
             const loginFormErrorCopy = {...loginFormError};
             const errorMessage = error.response.data.message;
