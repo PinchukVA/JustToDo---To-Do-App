@@ -228,7 +228,7 @@ function SignUp () {
       }else {
         const result = await handleCheckUserExist ( 'login', emailValue )
         if(result.data.exists){
-          signUpFormError.emailValue = 'exist'
+          signUpFormError.emailError = 'exist'
         }
       }
     }
