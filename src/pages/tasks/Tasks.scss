@@ -1,0 +1,24 @@
+@import '../../scss/Variables.scss';
+@import '../../scss/Extend.scss';
+@import '../../scss/Mixins.scss';
+
+.tasks__section{
+  max-width:1140px;
+  margin: 0px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.tasks__wraper{
+  max-width: 540px;
+  width: 100%;
+}
+
+.tasks-list{
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+}

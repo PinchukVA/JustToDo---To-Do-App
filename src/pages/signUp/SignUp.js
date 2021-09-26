@@ -133,7 +133,7 @@ function SignUp () {
 
       if ( res.statusText === 'Created'){
         setOkSignUp(true)
-        setLinkText(` "${userNick}'' is successfully registered. Please log in ` )
+        setLinkText(` ${userNick}'' is successfully registered. Please log in ` )
         setSignUpForm(clearState)
       }
 
