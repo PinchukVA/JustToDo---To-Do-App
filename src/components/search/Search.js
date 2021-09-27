@@ -30,7 +30,7 @@ function Search (props) {
       <input
         className='search-button'
         type='submit'
-        value='>'
+        value={'\u25B6'}
       />
       
       </form>

@@ -49,10 +49,6 @@ function Tasks () {
   const renderTasks = (arr) => {
     let result;
 
-    if (arr.length === 0) {
-      result = <span> No created users </span>;
-    }
-
     result = arr.map((item) => (
       < TaskUser
         key={item.id}

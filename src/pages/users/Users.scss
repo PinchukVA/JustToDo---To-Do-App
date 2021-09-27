@@ -1,0 +1,26 @@
+@import '../../scss/Variables.scss';
+@import '../../scss/Extend.scss';
+@import '../../scss/Mixins.scss';
+
+.users{
+  max-width:1140px;
+  margin: 0px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.users-wraper {
+  max-width: 720px;
+  width: 100%;
+}
+
+.users-list {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding-left:0px;
+}

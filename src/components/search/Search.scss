@@ -6,9 +6,10 @@
   margin-top: 15px;
   max-width: 720px;
   width: 100%;
-  background-color: $color-mint;
+  background-color: $background-white;
   border-style: none;
   border-radius: 5px;
+  border: 1px solid $border-color-main;
 }
 
 .search-form {
@@ -19,15 +20,16 @@
 
 .search-input {
   width: 85%;
-  height: 49px;
+  height: 50px;
   margin: 10px 0px 10px 50px;
-  padding-left: 10px;
+  padding-left: 20px;
   background-color: #fff;
   border-radius: 7px 7px;
   border-style: none;
   font-size: 18px;
   outline: none;
   color: $text-grey;
+  border: 1px solid $border-color-main;
 
   &:focus{
     border-bottom: 3px solid $border-color-main;
@@ -36,18 +38,17 @@
 
 .search-button {
   margin: 10px 10px 10px -50px;
-  width: 50px;
-  height: 50px;
   border: none;
-  background: $color-green;
+  background:$background-mint;
   border-radius: 0 5px 5px 0;
   transition: 0.3s;
-  font-size: 36px;
+  font-size: 24px;
+  padding: 0px 15px 0px 15px;
   font-weight: bold;
   color: #fff;
 
   &:hover {
-    background: $background-hover;
+    background:$background-green;
     cursor: pointer;
     transition: 0.3s;
   }

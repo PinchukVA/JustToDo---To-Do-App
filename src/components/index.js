@@ -6,3 +6,5 @@ export { default as AuthSelect } from './auth/authSelect/AuthSelect';
 export { default as AuthButtonSubmit } from './auth/authButtonSubmit/AuthButtonSubmit';
 export { default as TaskUser } from './taskUser/TaskUser';
 export { default as Search } from './search/Search';
+export { default as UserItem } from './userItem/UserItem';
+export { default as AddTaskForm } from './addTaskForm/AddTaskForm';
