@@ -6,8 +6,9 @@ function Search (props) {
 
   const  {
     placeholder,
-    obSubmit ={}, 
-    onChange ={}
+    // obSubmit , 
+    onChange,
+    value
   } = props
 
   return (
@@ -15,12 +16,13 @@ function Search (props) {
 
       <form 
       className='search-form'
-      onSubmit = {obSubmit}
+      // onSubmit = {obSubmit}
       >
 
       <input 
         className='search-input'
         type='text'
+        value={value}
         placeholder={placeholder}
         onChange={onChange}
       />

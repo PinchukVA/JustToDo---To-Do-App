@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import './Tasks.scss';
 
@@ -8,7 +8,14 @@ import {
 } from '../../components'
 
 function Tasks () {
-  
+
+  const [searchText, setSearchText] = useState('')
+
+  const handleChangeSearchText = (e) => {
+    setSearchText(e.target.value);
+    console.log("handleChangeSearchText", searchText);
+  };
+
   const tasks = [
     {
       id: 110,
@@ -61,6 +68,8 @@ function Tasks () {
       <section className='tasks__section'>
         <Search
         placeholder = 'Find Task'
+        onChange={handleChangeSearchText}
+        value={searchText}
         />
 
         <div className='tasks__wraper'>
