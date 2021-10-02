@@ -1,11 +1,11 @@
-@import '../../scss/Variables.scss';
+@import '../../static/styles/Variables.scss';
 
 .preview_block {
   max-width: 720px;
   width: 100%;
   padding: 5px;
   margin: 15px;
-  background: url(../../static/images/preview/preview.png);
+  background: url(../../static/images/png/preview.png);
   background-position: 90%;
   background-repeat: no-repeat;
   background-size: auto 100%;

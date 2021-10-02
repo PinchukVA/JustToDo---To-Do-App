@@ -16,7 +16,6 @@ function App() {
 
   return (
     <Router>
-
             <Route exact path={Routes.HomeRoute}>
                   <Home/>
             </Route>
@@ -38,7 +37,6 @@ function App() {
                 <Navigation/>
                 <Tasks/>
           </Route>
-
     </Router>
   );
 }
