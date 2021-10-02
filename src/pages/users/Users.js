@@ -1,24 +1,37 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios'
+import { useSelector, useDispatch } from 'react-redux';
 
 import './Users.scss';
-import axios from 'axios'
+
+import {  
+  addUsersList,
+  addUsersSearchList,
+  addUserSearch 
+} from '../../redux/actions/Actions';
 
 import { 
   Search,
   UserItem,
+  PopUpLink
 } from '../../components'
 
 function Users () {
 
+  const dispatch = useDispatch();
+  
+  const appState = useSelector( state => state.Reducer)
+
+  const { token,usersList, usersSearchList, isUserSearch} = appState;
+
   const [searchText, setSearchText] = useState('')
-  const [searchError, setSearchError] = useState(false)
-  const [searchErrorText, setSearchErrorText] = useState('')
 
+  const [sessionFault, setSessionFault] = useState(false)
 
+  
   const getUsers = async () => {
-    let accsesstoken = getCookie('authorization')
 
-    console.log(accsesstoken)
+    const accsesstoken = token
 
     axios.interceptors.request.use(
       config => {
@@ -29,94 +42,60 @@ function Users () {
         return Promise.reject(error)
       }
     )
-
     try {
-      const response = await axios.get('http://localhost:3001/users')
-      console.log(response);
+      let response = await axios.get('http://localhost:3001/users')
+      dispatch(addUsersList(response.data))
     } catch (error) {
-      console.error(error.message);
+      if (error.response.status === 401){
+        setSessionFault(true)
+      }
     }
   }
 
-  // useEffect(() => {
-  //   loadToDoList();
-  // }, []);
+  useEffect(  () => {
+    setSessionFault(false)
+    getUsers()
+  }, []);
 
   const handleChangeSearchText = (e) => {
-    setSearchError(false)
-    setSearchErrorText('')
     setSearchText(e.target.value);
     console.log("handleChangeSearchText", e);
   };
 
-  const checkInput = () => {
-    const searchTextCopy = searchText
+  const searchUser = () => {
 
-    if (searchTextCopy.trim().length === 0) {
-      setSearchError(true);
-      setSearchErrorText('Enter a nickname to search')
-      return true
+    let copyItems = [...usersList]
+    console.log('searchUser', copyItems)
+    let copyText = searchText;
+    let searchArray = [];
+
+    copyText = copyText.replace(/\s/g, '').toUpperCase();
+    searchArray = copyItems.filter(item => item.userName.replace(/\s/g, '').toUpperCase().includes(copyText) === true);
+
+    dispatch(addUsersSearchList([...searchArray]));
+    dispatch(addUserSearch(!isUserSearch));
+
+    if (copyText === '' ){
+      dispatch(addUserSearch(false));
+      dispatch(addUsersSearchList([]));
     }
-    return false
-  }
 
-  // const searchUser = () => {
-
-  // }
-
-  function getCookie(name) {
-    var value = "; " + document.cookie;
-    var parts = value.split("; " + name + "=");
-    if (parts.length === 2) return parts.pop().split(";").shift();
   }
 
   const handleSearchSubmit = e => {
     e.preventDefault();
 
-    if ( checkInput() ) {
-      return;
-    }
-
-    getUsers();
-
-    console.log('handleSearchSubmit', e.target.name)
+    searchUser();
+    // console.log('handleSearchSubmit', e.target.name)
   }
 
-  const users = [
-    {
-      id: "112550",
-      nickname: "user_test_0",
-      login: "user_test_0@yandex.ru"
-    },
-    {
-      id: "112551",
-      nickname: "user_test_1",
-      login: "user_test_1@yandex.ru"
-    },
-    {
-      id: "112552",
-      nickname: "user_test_2",
-      login: "user_test_2@yandex.ru"
-    },
-    {
-      id: "112553",
-      nickname: "user_test_3",
-      login: "user_test_3@yandex.ru"
-    },
-    {
-      id: "112554",
-      nickname: "user_test_4",
-      login: "user_test_4@yandex.ru"
-    }
-  ];
-
-  const renderUsers = (arr) => {
+  const renderUsers =  (arr) => {
     let result;
-
+    // console.log('renderUsers - выполняюсь')
     result = arr.map((item) => (
       < UserItem
         key={item.id}
-        nickname = {item.nickname}
+        nickname = {item.userName}
         taskId = {arr.indexOf(item)+1}
         login = {item.login}
       />
@@ -129,20 +108,24 @@ function Users () {
     <>
       <section className='users'>
 
+        {sessionFault && <PopUpLink 
+          text = 'The time of the session has expired. Log in again'
+          buttonText = 'Sign in'
+          link = 'SignInRoute'
+        />}
+
         <Search
           placeholder = 'Enter nickname'
           onChange ={handleChangeSearchText}
           onSubmit = {handleSearchSubmit}
           value = {searchText}
           nameInput = 'searchUserForm' 
-          searchError = {searchError}
-          searchErrorText = {searchErrorText}
           />
 
         <div className="users-wraper">
 
           <ul className="users-list">
-            {renderUsers(users)}
+          {!isUserSearch? renderUsers(usersList) : renderUsers(usersSearchList)}
           </ul>
 
         </div>

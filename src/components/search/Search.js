@@ -10,8 +10,6 @@ function Search (props) {
     onChange,
     value,
     nameInput,
-    searchErrorText,
-    searchError
   } = props
 
   return (
@@ -38,8 +36,6 @@ function Search (props) {
       />
       
       </form>
-
-      {searchError && <p className='search-error'>{searchErrorText}</p>}
     </div>
   )
 }

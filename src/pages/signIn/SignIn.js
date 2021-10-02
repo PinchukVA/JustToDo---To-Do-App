@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useHistory} from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import './SignIn.scss';
 
-import { Routes } from '../../utils/routes.js'
+import { signIn } from '../../redux/actions/Actions';
+import { setCookie } from '../../utils/cookies/Cookies'
+import { Routes, linkToRoute } from '../../utils/routes.js'
 import { authApi } from '../../api/AuthApi'
 import { 
     Preview,
@@ -12,6 +15,8 @@ import {
 } from '../../components'
 
 function SignIn () {
+
+    const dispatch = useDispatch();
 
     const history = useHistory();
 
@@ -76,17 +81,18 @@ function SignIn () {
         console.log('request send now')
         try{
             const res = await authApi.signInAuth(authUser)
-            console.log(res)
-            document.cookie = 'authorization' + '=' + res.data.token
-            document.cookie = 'role' + '=' + res.data.role
+            const {token, role } = res.data
+
+            setCookie('authorization', token )
+            setCookie('role', role )
+
+            dispatch(signIn({role, token}))
 
             if ( res.data.role === 'admin'){
-                history.replace(Routes.UsersRoute)
-                return
+                linkToRoute(history, Routes.UsersRoute)
+            }else{
+                linkToRoute(history, Routes.TasksRoute)
             }
-            history.replace(Routes.TasksRoute)
-
-
         }catch(error){
             const loginFormErrorCopy = {...loginFormError};
             const errorMessage = error.response.data.message;

@@ -12,9 +12,6 @@ function Tasks () {
 
   const [searchText, setSearchText] = useState('')
   const [text, setText] = useState('')
-  const [searchError, setSearchError] = useState(false)
-  const [searchErrorText, setSearchErrorText] = useState('')
-
 
   const handleChange = (e) => {
 
@@ -108,8 +105,6 @@ function Tasks () {
           onSubmit={handleSearchSubmit}
           value={searchText}
           nameInput = 'searchTaskForm' 
-          searchError = {searchError}
-          searchErrorText = {searchErrorText}
         />
 
         <div className='tasks__wraper'>

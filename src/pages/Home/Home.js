@@ -12,7 +12,7 @@ function Home () {
 
   return (
     <>
-      <h1> Главная Страница</h1>
+      <h1>Main page </h1>
     </>
   )
 }

@@ -1,8 +1,5 @@
 import React from 'react';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTasks} from '@fortawesome/free-solid-svg-icons';
-
 import './UserItem.scss';
 
 function UserItem (props){
