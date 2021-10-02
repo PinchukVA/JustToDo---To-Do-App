@@ -23,7 +23,6 @@ function UserItem (props){
 
       <span className="user-login">{login}</span>
 
-      <button className="user-button"><FontAwesomeIcon icon={faTasks} /> </button>
   </li>
 
   )

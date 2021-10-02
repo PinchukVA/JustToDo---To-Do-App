@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link} from 'react-router-dom';
+import { Link, useHistory} from 'react-router-dom';
 
 import './SignIn.scss';
 
@@ -12,6 +12,8 @@ import {
 } from '../../components'
 
 function SignIn () {
+
+    const history = useHistory();
 
     const [loginForm, setLoginForm] = useState({nickNameValue:'', passwordValue:''})
     // Types form Errors 'empty', 'notValid', 'Exist'
@@ -74,8 +76,16 @@ function SignIn () {
         console.log('request send now')
         try{
             const res = await authApi.signInAuth(authUser)
-            const token = res.data.token
-            document.cookie = 'jwt' + '=' + token
+            console.log(res)
+            document.cookie = 'authorization' + '=' + res.data.token
+            document.cookie = 'role' + '=' + res.data.role
+
+            if ( res.data.role === 'admin'){
+                history.replace(Routes.UsersRoute)
+                return
+            }
+            history.replace(Routes.TasksRoute)
+
 
         }catch(error){
             const loginFormErrorCopy = {...loginFormError};

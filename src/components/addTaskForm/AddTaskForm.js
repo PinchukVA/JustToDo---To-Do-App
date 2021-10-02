@@ -7,7 +7,8 @@ function AddTaskForm (props) {
   const {
     onSubmit,
     onChange,
-    value 
+    value,
+    nameInput 
   } = props
 
   return(
@@ -33,7 +34,11 @@ function AddTaskForm (props) {
 
           <div className="acordion-item__content">
 
-            <form className="add-task__wraper" onSubmit={onSubmit}>
+            <form 
+              className="add-task__wraper" 
+              onSubmit={onSubmit} 
+              
+            >
 
               <label className="add-task__label" htmlFor="new-todo">
                 Write task:
@@ -44,23 +49,8 @@ function AddTaskForm (props) {
                 id="new-todo"
                 value={value}
                 onChange={onChange}
+                name={nameInput}
               />
-
-              <select
-                className="add-task__select"
-                name="add-task__select"
-                value=""
-              >
-
-                <option value="" disabled>
-                  Choice user please
-                </option>
-
-                <option>User 1</option>
-                <option>User 2</option>
-                <option>User 3</option>
-
-              </select>
 
               <input 
                 className="add-task__button" 

@@ -4,17 +4,49 @@ import './Tasks.scss';
 
 import { 
   Search,
-  TaskUser 
+  TaskUser,
+  AddTaskForm 
 } from '../../components'
 
 function Tasks () {
 
   const [searchText, setSearchText] = useState('')
+  const [text, setText] = useState('')
+  const [searchError, setSearchError] = useState(false)
+  const [searchErrorText, setSearchErrorText] = useState('')
 
-  const handleChangeSearchText = (e) => {
-    setSearchText(e.target.value);
-    console.log("handleChangeSearchText", searchText);
+
+  const handleChange = (e) => {
+
+    if (e.target.name === 'addTaskForm') {
+      setText(e.target.value);
+      console.log("handleChange - text", text);
+    }
+
+    if (e.target.name === 'searchTaskForm') {
+      setSearchText(e.target.value);
+      console.log("handleChange - searchText", searchText);
+    }
+  }
+
+  const handleSearchSubmit = e => {
+    e.preventDefault();
+    console.log('handleSearchSubmit')
+  }
+  
+  const handleChangeText = (e) => {
+    setText(e.target.value);
+    console.log("handleChangeText", e);
   };
+
+  const checkInput = () => {
+
+  }
+
+  const handleTaskSubmit = e => {
+    e.preventDefault();
+    console.log('handleTaskSubmit', e.target.name)
+  }
 
   const tasks = [
     {
@@ -62,10 +94,22 @@ function Tasks () {
   return (
     <>
       <section className='tasks__section'>
+
+        <AddTaskForm 
+          onSubmit = {handleTaskSubmit}
+          onChange = {handleChange}
+          nameInput = 'addTaskForm' 
+          value={text}
+        />
+
         <Search
-        placeholder = 'Find Task'
-        onChange={handleChangeSearchText}
-        value={searchText}
+          placeholder = 'Find Task'
+          onChange={handleChange}
+          onSubmit={handleSearchSubmit}
+          value={searchText}
+          nameInput = 'searchTaskForm' 
+          searchError = {searchError}
+          searchErrorText = {searchErrorText}
         />
 
         <div className='tasks__wraper'>

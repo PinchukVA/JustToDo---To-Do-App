@@ -1,36 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import './Users.scss';
+import axios from 'axios'
 
 import { 
   Search,
   UserItem,
-  AddTaskForm
 } from '../../components'
 
 function Users () {
 
-  const [text, setText] = useState('')
-
   const [searchText, setSearchText] = useState('')
+  const [searchError, setSearchError] = useState(false)
+  const [searchErrorText, setSearchErrorText] = useState('')
 
-  const handleChangeText = (e) => {
-    setText(e.target.value);
-    console.log("handleChangeText", text);
-  };
+
+  const getUsers = async () => {
+    let accsesstoken = getCookie('authorization')
+
+    console.log(accsesstoken)
+
+    axios.interceptors.request.use(
+      config => {
+        config.headers.authorization = `Bearer ${accsesstoken}`;
+        return config;
+      },
+      error => {
+        return Promise.reject(error)
+      }
+    )
+
+    try {
+      const response = await axios.get('http://localhost:3001/users')
+      console.log(response);
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
+  // useEffect(() => {
+  //   loadToDoList();
+  // }, []);
 
   const handleChangeSearchText = (e) => {
+    setSearchError(false)
+    setSearchErrorText('')
     setSearchText(e.target.value);
-    console.log("handleChangeSearchText", searchText);
+    console.log("handleChangeSearchText", e);
   };
 
   const checkInput = () => {
+    const searchTextCopy = searchText
 
+    if (searchTextCopy.trim().length === 0) {
+      setSearchError(true);
+      setSearchErrorText('Enter a nickname to search')
+      return true
+    }
+    return false
   }
-  
-  const handleTaskSubmit = e => {
+
+  // const searchUser = () => {
+
+  // }
+
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
+
+  const handleSearchSubmit = e => {
     e.preventDefault();
-    console.log('handleTaskSubmit')
+
+    if ( checkInput() ) {
+      return;
+    }
+
+    getUsers();
+
+    console.log('handleSearchSubmit', e.target.name)
   }
 
   const users = [
@@ -80,16 +129,14 @@ function Users () {
     <>
       <section className='users'>
 
-        <AddTaskForm 
-          onSubmit={handleTaskSubmit}
-          onChange={handleChangeText}
-          value={text}
-        />
-
         <Search
-          placeholder = 'Find User'
-          onChange={handleChangeSearchText}
-          value={searchText}
+          placeholder = 'Enter nickname'
+          onChange ={handleChangeSearchText}
+          onSubmit = {handleSearchSubmit}
+          value = {searchText}
+          nameInput = 'searchUserForm' 
+          searchError = {searchError}
+          searchErrorText = {searchErrorText}
           />
 
         <div className="users-wraper">

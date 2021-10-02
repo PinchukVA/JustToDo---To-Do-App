@@ -9,5 +9,4 @@ export const usersApi = {
   checkUserExists:  (body) =>{
     return  axios.post('http://localhost:3001/user/exists', body)
   }
-
 }
