@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux';
 
 import './Users.scss';
+import preloader_L from '../../static/images/svg/preloader_L.svg';
 
 import {  
   addUsersList,
@@ -22,34 +23,51 @@ function Users () {
   
   const appState = useSelector( state => state.Reducer)
 
-  const { token,usersList, usersSearchList, isUserSearch} = appState;
+  const { token,role,usersList, usersSearchList, isUserSearch} = appState;
 
   const [searchText, setSearchText] = useState('')
-
+  const [isRequest, setIsRequest] = useState(true)
   const [sessionFault, setSessionFault] = useState(false)
 
   
-  const getUsers = async () => {
+  // const getUsers = async () => {
 
-    const accsesstoken = token
+  //   const accsesstoken = token
 
-    axios.interceptors.request.use(
-      config => {
-        config.headers.authorization = `Bearer ${accsesstoken}`;
-        return config;
-      },
-      error => {
-        return Promise.reject(error)
-      }
-    )
-    try {
-      let response = await axios.get('http://localhost:3001/users')
-      dispatch(addUsersList(response.data))
-    } catch (error) {
-      if (error.response.status === 401){
-        setSessionFault(true)
+  //   axios.interceptors.request.use(
+  //     config => {
+  //       config.headers.authorization = `Bearer ${accsesstoken}`;
+  //       return config;
+  //     },
+  //     error => {
+  //       return Promise.reject(error)
+  //     }
+  //   )
+  //   try {
+  //     let response = await axios.get('http://localhost:3001/users')
+  //     dispatch(addUsersList(response.data))
+  //   } catch (error) {
+  //     if (error.response.status === 401){
+  //       setSessionFault(true)
+  //     }
+  //   }
+  // }
+  const getUsers = () =>{
+    const options = {
+      headers:{
+        authorization:`Bearer ${token}`
       }
     }
+    axios.get('http://localhost:3001/users', options)
+          .then((response)=>{
+            dispatch(addUsersList(response.data))
+            setIsRequest(false)
+          },(error)=>{
+            if (error.response.status === 401){
+                    setSessionFault(true)
+                  }
+            console.log(error)
+          })
   }
 
   useEffect(  () => {
@@ -59,13 +77,11 @@ function Users () {
 
   const handleChangeSearchText = (e) => {
     setSearchText(e.target.value);
-    console.log("handleChangeSearchText", e);
   };
 
   const searchUser = () => {
 
     let copyItems = [...usersList]
-    console.log('searchUser', copyItems)
     let copyText = searchText;
     let searchArray = [];
 
@@ -84,23 +100,23 @@ function Users () {
 
   const handleSearchSubmit = e => {
     e.preventDefault();
-
     searchUser();
-    // console.log('handleSearchSubmit', e.target.name)
   }
 
   const renderUsers =  (arr) => {
-    let result;
-    // console.log('renderUsers - выполняюсь')
-    result = arr.map((item) => (
-      < UserItem
-        key={item.id}
-        nickname = {item.userName}
-        taskId = {arr.indexOf(item)+1}
-        login = {item.login}
-      />
-    ));
-    return result;
+    if (!isRequest){
+      let result;
+      result = arr.map((item) => (
+        < UserItem
+          key={item.id}
+          nickname = {item.userName}
+          taskId = {arr.indexOf(item)+1}
+          login = {item.login}
+        />
+      ));
+      return result;
+    }
+    return
   };
 
 
@@ -125,7 +141,9 @@ function Users () {
         <div className="users-wraper">
 
           <ul className="users-list">
+          {isRequest &&<img src={preloader_L}/>}
           {!isUserSearch? renderUsers(usersList) : renderUsers(usersSearchList)}
+          
           </ul>
 
         </div>

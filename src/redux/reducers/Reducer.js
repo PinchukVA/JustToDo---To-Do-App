@@ -11,7 +11,7 @@ const initialState = {
 };
 
 export const Reducer = (state = initialState, action) => {
-  // console.log('Reducer -initialState',state)
+  console.log('Reducer -initialState',state)
   const {payload} = action;
   switch(action.type){
     case 'SIGN_IN':
