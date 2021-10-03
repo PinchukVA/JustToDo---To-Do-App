@@ -81,6 +81,7 @@ function SignIn () {
         console.log('request send now')
         try{
             const res = await authApi.signInAuth(authUser)
+            console.log('SignIN -', res)
             const {token, role } = res.data
 
             setCookie('authorization', token )

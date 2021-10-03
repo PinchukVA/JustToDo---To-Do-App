@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux';
 
 import './Users.scss';
@@ -10,7 +9,7 @@ import {
   addUsersSearchList,
   addUserSearch 
 } from '../../redux/actions/Actions';
-
+import { adminApi } from '../../api/AdminApi'
 import { 
   Search,
   UserItem,
@@ -52,22 +51,24 @@ function Users () {
   //     }
   //   }
   // }
+
   const getUsers = () =>{
+
     const options = {
       headers:{
         authorization:`Bearer ${token}`
       }
     }
-    axios.get('http://localhost:3001/users', options)
-          .then((response)=>{
-            dispatch(addUsersList(response.data))
-            setIsRequest(false)
-          },(error)=>{
-            if (error.response.status === 401){
-                    setSessionFault(true)
-                  }
-            console.log(error)
-          })
+    adminApi.getUsersForAdmin(options)
+      .then((response)=>{
+        dispatch(addUsersList(response.data))
+        setIsRequest(false)
+      },(error)=>{
+        if (error.response.status === 401){
+                setSessionFault(true)
+              }
+        console.log(error)
+      })
   }
 
   useEffect(  () => {
@@ -105,6 +106,13 @@ function Users () {
 
   const renderUsers =  (arr) => {
     if (!isRequest){
+
+      if (arr.length === 0){
+        return(
+          <span className='list-empty' >No users available</span>
+        )
+      }
+
       let result;
       result = arr.map((item) => (
         < UserItem

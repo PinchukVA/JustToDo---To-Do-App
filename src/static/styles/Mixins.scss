@@ -28,3 +28,12 @@
   width: 70%;
   color:$text-black;
 }
+
+@mixin message-empty{
+  margin: 0px auto;
+  padding: 10px 0;
+  font-family: $font-family-second;
+  font-size: 18px;
+  font-weight: 400;
+  color:$text-black;
+}

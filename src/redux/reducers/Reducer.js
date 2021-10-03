@@ -6,8 +6,10 @@ const initialState = {
   usersList: [],
   usersSearchList: [],
   tasksList: [],
+  tasksSearchList: [],
   userTasksList:[],
-  isUserSearch:false
+  isUserSearch:false,
+  isTaskSearch:false
 };
 
 export const Reducer = (state = initialState, action) => {
@@ -30,6 +32,10 @@ export const Reducer = (state = initialState, action) => {
       // console.log('ADD_TASKS_LIST', action.payload)
       return {...state, tasksList:payload}
 
+      case 'ADD_TASKS_SEARCH_LIST':
+      // console.log('ADD_TASKS_SEARCH_LIST', action.payload)
+      return {...state, tasksSearchList:payload}
+
       case 'ADD_USER_TASKS_LIST':
       // console.log('ADD_USER_TASKS_LIST', action.payload)
       return {...state, userTasksList:payload}
@@ -37,6 +43,10 @@ export const Reducer = (state = initialState, action) => {
       case 'ADD_USER_SEARCH':
       // console.log('ADD_USER_SEARCH', action.payload)
       return {...state, isUserSearch:payload}
+
+      case 'ADD_TASK_SEARCH':
+      // console.log('ADD_TASK_SEARCH', action.payload)
+      return {...state, isTaskSearch:payload}
       
     default:
       // console.log('Reducer 2 -initialState2',initialState)

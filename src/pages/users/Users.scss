@@ -24,3 +24,7 @@
   flex-direction: column;
   padding-left:0px;
 }
+
+.list-empty {
+  @include message-empty;
+}
