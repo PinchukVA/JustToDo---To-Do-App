@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import './SignIn.scss';
 
 import { signIn } from '../../redux/actions/Actions';
-import { setCookie } from '../../utils/cookies/Cookies'
+import { setCookie } from '../../utils/Cookies'
 import { Routes, linkToRoute } from '../../utils/routes.js'
 import { authApi } from '../../api/AuthApi'
 import { 
@@ -86,7 +86,7 @@ function SignIn () {
         // console.log('SignIN -', res)
         const {token} = res.data
         setCookie('authorization', token )
-        
+
         const decodeData = jwt.decode(token)
         const {role, id:userId} = decodeData
 
