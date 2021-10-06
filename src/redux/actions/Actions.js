@@ -20,7 +20,7 @@ export const addUsersSearchList = data => {
   }
 }
 export const addTasksList = data => {
-  // console.log('addTasksList', data)
+  console.log('addTasksList', data)
   return {
     type: 'ADD_TASKS_LIST',
     payload: data
@@ -33,13 +33,7 @@ export const addTasksSearchList = data => {
     payload: data
   }
 }
-export const addUserTasksList = data => {
-  // console.log('addUserTasksList', data)
-  return {
-    type: 'ADD_USER_TASKS_LIST',
-    payload: data
-  }
-}
+
 export const addUserSearch = data => {
   // console.log('addUserSearch', data)
   return {

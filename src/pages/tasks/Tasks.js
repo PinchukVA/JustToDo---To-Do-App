@@ -7,7 +7,6 @@ import preloader_L from '../../static/images/svg/preloader_L.svg';
 
 import {  
   addTasksList,
-  addUserTasksList,
   addTasksSearchList,
   addTaskSearch 
 } from '../../redux/actions/Actions';
@@ -18,6 +17,7 @@ import {
   TaskUser,
   AddTaskForm,
   PopUpLink, 
+  EditForm
 } from '../../components'
 
 function Tasks () {
@@ -34,20 +34,16 @@ function Tasks () {
   const [helpText, setHelpText] = useState('')
   const [isRequest, setIsRequest] = useState(true)
   const [sessionFault, setSessionFault] = useState(false)
-  const [userId, setUserId]=useState('')
+  const [isEdit, setIsEdit] = useState(false)
 
   const getLists = () =>{
 
-    const options = {
-      headers:{
-        authorization:`Bearer ${token}`
-      }
-    }
-
+    const accsesstoken = token;
+ 
     const url = `http://localhost:3001/tasks/${user_Id}`
 
     if ( role === 'user'){
-      usersApi.GetTasksForUser(options)
+      usersApi.GetTasksForUser(accsesstoken)
       .then((response)=>{
         dispatch(addTasksList(response.data))
         setIsRequest(false)
@@ -58,7 +54,7 @@ function Tasks () {
         console.log(error)
       })
     } else {
-      adminApi.GetTasksUserForAdmin(url,options)
+      adminApi.GetTasksUserForAdmin(url,accsesstoken)
       .then((response)=>{
         dispatch(addTasksList(response.data))
         setIsRequest(false)
@@ -73,12 +69,8 @@ function Tasks () {
   }
 
   const patchTask = (taskID, IDchecked, taskListCopy, userId) =>{
-
-    const options = {
-      headers:{
-        authorization:`Bearer ${token}`
-      }
-    }
+    
+    const accsesstoken = token;
 
     const body = 
       {
@@ -87,7 +79,7 @@ function Tasks () {
         checked: IDchecked
     }
 
-    usersApi.PatchTasksForUser(body, options)
+    usersApi.PatchTasksForUser(body, accsesstoken)
       .then((response)=>{
         console.log('Ответ - на патч', response)
         if (response.data === 'OK'){
@@ -112,17 +104,15 @@ function Tasks () {
     if (e.target.name === 'addTaskForm') {
       setText(e.target.value);
       setHelpText('')
-      console.log("handleChange - text", text);
     }
 
     if (e.target.name === 'searchTaskForm') {
       setSearchText(e.target.value);
-      console.log("handleChange - searchText", searchText);
     }
   }
 
-  const searchTask = () => {
-
+  const searchTask = (e) => {
+    e.preventDefault();
     let taskListCopy = [...tasksList]
     let copyText = searchText;
     let searchArray = [];
@@ -140,51 +130,109 @@ function Tasks () {
 
   }
 
-  const handleSearchSubmit = e => {
-    e.preventDefault();
-    console.log('handleSearchSubmit')
-    searchTask()
+  const handleDeleteTask = id => {
+
+    const accsesstoken = token;
+
+    let user_Id_Copy = user_Id;
+    let tasksListCopy = [...tasksList]
+    let tasksSearchListCopy = [...tasksSearchList]
+
+
+    let delId = tasksListCopy.findIndex((item) => item._id === id);
+    let delIdSearch = tasksSearchListCopy.findIndex((item) => item._id === id);
+
+    tasksListCopy.splice(delId, 1);
+    tasksSearchListCopy.splice(delIdSearch, 1);
+
+    adminApi.deleteUserTask(id, user_Id_Copy, accsesstoken)
+    .then((response)=>{
+      if (response.status === 204){
+      dispatch(addTasksList(tasksListCopy))
+      dispatch(addTasksSearchList(tasksSearchListCopy))
+      }
+    },(error)=>{
+      console.log(error.response.status)
+      console.log(error)
+    })
   }
 
   const checkInput = () => {
+    
     let result = true;
     let arrayCopy = [...tasksList]
     let copyText = text;
-    console.log('checkInput-arrayCoppy',arrayCopy, 'and textCopy - ',copyText )
+
     copyText = copyText.replace(/\s/g, '');
-    console.log( 'and textCopy - ',copyText.replace(/\s/g, '') )
-    let index = arrayCopy.findIndex(item => item.name.replace(/\s/g, '') ===  copyText );
-    console.log('checkInput-index', index )
+
+    let index = arrayCopy.findIndex(item => item.name.replace(/\s/g, '') === copyText);
+
     if (index === -1){
       result = false
     }
-    
     return result;
+  }
+
+  const createTask = () =>{
+
+    let taskListCopy = [...tasksList]
+    let copyText = text;
+    let user_Id_Copy = user_Id;
+
+    const options = {
+      headers:{
+        authorization:`Bearer ${token}`
+      }
+    }
+
+    const body = 
+    {
+      checked:false,
+      name: copyText,
+      userId:user_Id_Copy
+    }
+
+  console.log('createTask- options--',options,'and body --', body)
+    adminApi.createUserTask(copyText, user_Id_Copy, token)
+      .then((response)=>{
+        if (response.data === 'Created'){
+          dispatch(addTasksList(taskListCopy.concat(body)))
+          setText('')
+        }
+      },(error)=>{
+        if (error.response.status === 401){
+                setSessionFault(true)
+              }
+        console.log(error)
+      })
   }
 
   const handleTaskSubmit = e => {
     e.preventDefault();
-    console.log('handleTaskSubmit', e.target.name)
-    if ( checkInput() ) {
-      console.log('handleTaskSubmit - error text print')
-      setHelpText('task is already exist')
-      return; 
-    }
     if ( text.trim().length < 4 ){
       setHelpText('the minimum length of the task is 4 characters')
       return;
     }
-    console.log('handleTaskSubmit - sumitform')
+    if ( checkInput() ) {
+      setHelpText('task is already exist')
+      return; 
+    }
+    createTask()
   }
 
   const handleChangecheckBox = id => {
     const taskListCopy = [...tasksList];
     const changeObj = taskListCopy.find((item) => item._id === id);
-    // console.log('handleChangecheckBox - id: ', id, 'arrayCopy - ',taskListCopy, 'changeObj - ',changeObj)
+
     changeObj.checked
       ? (changeObj.checked = false)
       : (changeObj.checked = true);
     patchTask(id, changeObj.checked, taskListCopy, changeObj.userId)
+  }
+
+  const handleOpenEditTask = () => {
+    console.log('handleOpenEditTask')
+    setIsEdit(!isEdit);
   }
 
   const renderTasks = (arr) => {
@@ -203,12 +251,18 @@ function Tasks () {
           item={item}
           taskId = {arr.indexOf(item)+1}
           onChange={() => handleChangecheckBox(item._id)}
+          role={role}
+          onClick={() => handleDeleteTask(item._id)}
+          handleClick={() => handleOpenEditTask()}
         />
       ));
       return result;
     }
    return 
   }
+  console.log('FindState--', tasksList)
+
+  
 
   return (
     <>
@@ -220,7 +274,12 @@ function Tasks () {
           link = 'SignInRoute'
         />}
 
-        {role==='admin' && < AddTaskForm 
+        {isEdit && role==='admin' && 
+        <EditForm
+          onClick={()=>handleOpenEditTask()}
+        /> }
+
+        {role==='admin' && !isTaskSearch && < AddTaskForm 
           onSubmit = {handleTaskSubmit}
           onChange = {handleChange}
           nameInput = 'addTaskForm' 
@@ -228,10 +287,12 @@ function Tasks () {
           value={text}
         />}
 
+        
+
         <Search
           placeholder = 'Find Task'
           onChange={handleChange}
-          onSubmit={handleSearchSubmit}
+          onSubmit={searchTask}
           value={searchText}
           nameInput = 'searchTaskForm' 
         />

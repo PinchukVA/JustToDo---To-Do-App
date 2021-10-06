@@ -28,38 +28,10 @@ function Users () {
   const [isRequest, setIsRequest] = useState(true)
   const [sessionFault, setSessionFault] = useState(false)
 
-  
-  // const getUsers = async () => {
-
-  //   const accsesstoken = token
-
-  //   axios.interceptors.request.use(
-  //     config => {
-  //       config.headers.authorization = `Bearer ${accsesstoken}`;
-  //       return config;
-  //     },
-  //     error => {
-  //       return Promise.reject(error)
-  //     }
-  //   )
-  //   try {
-  //     let response = await axios.get('http://localhost:3001/users')
-  //     dispatch(addUsersList(response.data))
-  //   } catch (error) {
-  //     if (error.response.status === 401){
-  //       setSessionFault(true)
-  //     }
-  //   }
-  // }
-
   const getUsers = () =>{
+    const accsesstoken = token;
 
-    const options = {
-      headers:{
-        authorization:`Bearer ${token}`
-      }
-    }
-    adminApi.getUsersForAdmin(options)
+    adminApi.getUsersForAdmin(accsesstoken)
       .then((response)=>{
         dispatch(addUsersList(response.data))
         setIsRequest(false)

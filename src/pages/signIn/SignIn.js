@@ -83,7 +83,6 @@ function SignIn () {
         console.log('request send now')
         
         const res = await authApi.signInAuth(authUser)
-        // console.log('SignIN -', res)
         const {token} = res.data
         setCookie('authorization', token )
 
@@ -92,7 +91,7 @@ function SignIn () {
 
         dispatch(signIn({role, token, userId}))
 
-        if ( res.data.role === 'admin'){
+        if ( role === 'admin'){
             linkToRoute(history, Routes.UsersRoute)
         }else{
             linkToRoute(history, Routes.TasksRoute)

@@ -6,70 +6,15 @@
   max-width: 720px;
   width: 100%;
   margin-top: 15px;
-}
-
-/* Form accordion */
-.form__acordion {
-  font-family: $font-family-second;
-}
-
-.acordion-item {
-  position: relative;
-  margin-bottom: 20px;
-}
-
-.acordion-item__input {
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0;
-}
-
-.acordion-item__trigger {
-  display: block;
-  padding: 15px 0px 15px 55px;
-  font-size: 18px;
-  border-radius: 5px;
-  background-color: $background-mint;
-  color:$text-white;
-
-  &:hover{
-    cursor: pointer;
-  }
-
-  &::after {
-    content:"\25BC";
-    color:$text-white;
-    font-size: 30px;
-    position: absolute;
-    right: 45px;
-    top: 5px;
-  }
+  background: $background-second;
+  border-radius:5px;
+  border: 1px solid $border-color-main;
 }
 
 .acordion-item__content {
   padding: 20px;
-  max-height: 0;
-  overflow: hidden;
   padding: 0 15px;
-  transition: all 0.45s;
 }
-
-.acordion-item__input:checked ~ .acordion-item__trigger {
-  border-radius: 5px 5px 0px 0px;
-}
-
-.acordion-item__input:checked ~ .acordion-item__trigger::after {
-  content:"\25B2";
-}
-
-.acordion-item__input:checked ~ .acordion-item__content {
-  background-color: $background-white;
-  border: 1px solid $border-color-main;
-  transition: all 0.45s;
-  max-height: 1000px;
-}
-/* ---------- */
 
 .add-task__wraper {
   color: $text-black;
@@ -89,17 +34,6 @@
   @include form-input;
   max-width: 25%;
   margin: 0px 10px;
-}
-
-.add-task__select {
-  background: $background-main;
-  outline: 0;
-  border: 1px solid $border-color-main;
-  font-size: 16px;
-  padding: 3px;
-  margin: 0px 10px;
-  max-width: 25%;
-  color:$text-black;
 }
 
 .add-task__button {

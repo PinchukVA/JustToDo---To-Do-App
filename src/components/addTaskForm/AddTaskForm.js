@@ -2,73 +2,45 @@ import React from 'react';
 
 import './AddTaskForm.scss';
 
-function AddTaskForm (props) {
-
-  const {
-    onSubmit,
-    onChange,
-    value,
-    nameInput,
-    helpText
-  } = props
+function AddTaskForm ({onSubmit, onChange, value, nameInput, helpText}) {
 
   return(
 
     <div className="users__form-wraper">
 
-      <div className="form__acordion">
+      <div className="acordion-item__content">
 
-        <div className="acordion-item">
+      <form 
+        className="add-task__wraper" 
+        onSubmit={onSubmit} 
+        
+      >
 
-          <input
-            className="acordion-item__input"
-            type="checkbox"
-            id="form__acordion-1"
-          />
+        <label className="add-task__label" htmlFor="new-todo">
+          Write task:
+        </label>
 
-          <label
-            className="acordion-item__trigger"
-            htmlFor="form__acordion-1"
-          >
-            Add a new task for a user
-          </label>
+        <input
+          className="add-task__input"
+          id="new-todo"
+          value={value}
+          onChange={onChange}
+          name={nameInput}
+        />
 
-          <div className="acordion-item__content">
+        <input 
+          className="add-task__button" 
+          type="submit" 
+          value="Create task" 
+        />
 
-            <form 
-              className="add-task__wraper" 
-              onSubmit={onSubmit} 
-              
-            >
+        
 
-              <label className="add-task__label" htmlFor="new-todo">
-                Write task:
-              </label>
+      </form>
 
-              <input
-                className="add-task__input"
-                id="new-todo"
-                value={value}
-                onChange={onChange}
-                name={nameInput}
-              />
-
-              <input 
-                className="add-task__button" 
-                type="submit" 
-                value="Create task" 
-              />
-
-              
-
-            </form>
-
-            <div className='add-task_help-text'>
-              <span>{helpText}</span>
-            </div>
-
-          </div>
-        </div>
+      <div className='add-task_help-text'>
+        <span>{helpText}</span>
+      </div>
 
       </div>
 
