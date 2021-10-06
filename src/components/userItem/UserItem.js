@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'
 
 import './UserItem.scss';
 
@@ -7,12 +8,14 @@ function UserItem (props){
   const { 
     taskId,
     nickname,
-    login
+    login,
+    idPath
   } = props
 
   return(
-
-    <li className="user-item">
+  <>
+    <Link to={`/tasks/${idPath}`} className="link-item">
+      <li className="user-item">
 
       <span className="user-id">{taskId}</span>
 
@@ -20,8 +23,9 @@ function UserItem (props){
 
       <span className="user-login">{login}</span>
 
-  </li>
-
+      </li>
+    </Link>
+  </>
   )
 }
 

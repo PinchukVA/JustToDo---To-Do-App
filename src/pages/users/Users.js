@@ -117,6 +117,7 @@ function Users () {
       result = arr.map((item) => (
         < UserItem
           key={item.id}
+          idPath={item._id}
           nickname = {item.userName}
           taskId = {arr.indexOf(item)+1}
           login = {item.login}

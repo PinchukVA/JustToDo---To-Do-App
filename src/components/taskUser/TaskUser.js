@@ -10,7 +10,6 @@ function TaskUser (props) {
     item,
     onChange
   } = props;
-  console.log('TaskUser - item',taskId, 'id-item', item._id, 'Checked:', item.checked)
   return (
     <li className='task-item'>
         <span className='item-id'>{taskId}</span>

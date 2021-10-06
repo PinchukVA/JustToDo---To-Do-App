@@ -33,11 +33,11 @@ function Navigation () {
 
           { role === 'admin' && <Link to={Routes.UsersRoute} 
               style={{ textDecoration: 'none' }} >
-                <li><span>Пользователи</span></li>
+                <li><span>Users</span></li>
           </Link>}
           
 
-          <li><span onClick = {clearState} >Выход</span></li>
+          <li><span onClick = {clearState} >Sign Out</span></li>
        </ul>
      </nav>
     </>

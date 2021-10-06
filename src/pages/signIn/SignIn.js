@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useHistory} from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import jwt from 'jsonwebtoken';
 
 import './SignIn.scss';
 
@@ -64,6 +65,7 @@ function SignIn () {
     }
 
     const handleSubmitForm = async (event) => {
+        try{
         event.preventDefault();
         const loginFormCopy = {...loginForm};
 
@@ -79,21 +81,22 @@ function SignIn () {
         }
         //else we send Post request
         console.log('request send now')
-        try{
-            const res = await authApi.signInAuth(authUser)
-            console.log('SignIN -', res)
-            const {token, role } = res.data
+        
+        const res = await authApi.signInAuth(authUser)
+        // console.log('SignIN -', res)
+        const {token} = res.data
+        setCookie('authorization', token )
+        
+        const decodeData = jwt.decode(token)
+        const {role, id:userId} = decodeData
 
-            setCookie('authorization', token )
-            setCookie('role', role )
+        dispatch(signIn({role, token, userId}))
 
-            dispatch(signIn({role, token}))
-
-            if ( res.data.role === 'admin'){
-                linkToRoute(history, Routes.UsersRoute)
-            }else{
-                linkToRoute(history, Routes.TasksRoute)
-            }
+        if ( res.data.role === 'admin'){
+            linkToRoute(history, Routes.UsersRoute)
+        }else{
+            linkToRoute(history, Routes.TasksRoute)
+        }
         }catch(error){
             const loginFormErrorCopy = {...loginFormError};
             const errorMessage = error.response.data.message;

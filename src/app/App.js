@@ -54,6 +54,13 @@ function App() {
                   hasPermision={role === 'user'}
             />
 
+            < AutorizedRoutes 
+                  path='/tasks/:user_Id'
+                  component = {Tasks}
+                  isAutorized = {Boolean(token)}
+                  hasPermision={role === 'admin'}
+            />
+
     </Router>
   );
 }

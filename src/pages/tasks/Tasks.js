@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom'
 
 import './Tasks.scss';
 import preloader_L from '../../static/images/svg/preloader_L.svg';
@@ -11,6 +12,7 @@ import {
   addTaskSearch 
 } from '../../redux/actions/Actions';
 import { usersApi } from '../../api/UsersApi'
+import { adminApi } from '../../api/AdminApi'
 import { 
   Search,
   TaskUser,
@@ -20,6 +22,8 @@ import {
 
 function Tasks () {
 
+  const {user_Id } = useParams();
+
   const dispatch = useDispatch();
 
   const appState = useSelector( state => state.Reducer)
@@ -27,11 +31,12 @@ function Tasks () {
 
   const [searchText, setSearchText] = useState('')
   const [text, setText] = useState('')
+  const [helpText, setHelpText] = useState('')
   const [isRequest, setIsRequest] = useState(true)
   const [sessionFault, setSessionFault] = useState(false)
   const [userId, setUserId]=useState('')
 
-  const getTasks = () =>{
+  const getLists = () =>{
 
     const options = {
       headers:{
@@ -39,9 +44,11 @@ function Tasks () {
       }
     }
 
-    usersApi.GetTasksForUser(options)
+    const url = `http://localhost:3001/tasks/${user_Id}`
+
+    if ( role === 'user'){
+      usersApi.GetTasksForUser(options)
       .then((response)=>{
-        console.log('Ответ - массив', response.data)
         dispatch(addTasksList(response.data))
         setIsRequest(false)
       },(error)=>{
@@ -50,6 +57,19 @@ function Tasks () {
               }
         console.log(error)
       })
+    } else {
+      adminApi.GetTasksUserForAdmin(url,options)
+      .then((response)=>{
+        dispatch(addTasksList(response.data))
+        setIsRequest(false)
+      },(error)=>{
+        if (error.response.status === 401){
+                setSessionFault(true)
+              }
+        console.log(error)
+      })
+    }
+    
   }
 
   const patchTask = (taskID, IDchecked, taskListCopy, userId) =>{
@@ -84,13 +104,14 @@ function Tasks () {
 
   useEffect(  () => {
     setSessionFault(false)
-    getTasks()
+    getLists()
   }, []);
 
   const handleChange = (e) => {
 
     if (e.target.name === 'addTaskForm') {
       setText(e.target.value);
+      setHelpText('')
       console.log("handleChange - text", text);
     }
 
@@ -126,12 +147,34 @@ function Tasks () {
   }
 
   const checkInput = () => {
-
+    let result = true;
+    let arrayCopy = [...tasksList]
+    let copyText = text;
+    console.log('checkInput-arrayCoppy',arrayCopy, 'and textCopy - ',copyText )
+    copyText = copyText.replace(/\s/g, '');
+    console.log( 'and textCopy - ',copyText.replace(/\s/g, '') )
+    let index = arrayCopy.findIndex(item => item.name.replace(/\s/g, '') ===  copyText );
+    console.log('checkInput-index', index )
+    if (index === -1){
+      result = false
+    }
+    
+    return result;
   }
 
   const handleTaskSubmit = e => {
     e.preventDefault();
     console.log('handleTaskSubmit', e.target.name)
+    if ( checkInput() ) {
+      console.log('handleTaskSubmit - error text print')
+      setHelpText('task is already exist')
+      return; 
+    }
+    if ( text.trim().length < 4 ){
+      setHelpText('the minimum length of the task is 4 characters')
+      return;
+    }
+    console.log('handleTaskSubmit - sumitform')
   }
 
   const handleChangecheckBox = id => {
@@ -181,6 +224,7 @@ function Tasks () {
           onSubmit = {handleTaskSubmit}
           onChange = {handleChange}
           nameInput = 'addTaskForm' 
+          helpText={helpText}
           value={text}
         />}
 

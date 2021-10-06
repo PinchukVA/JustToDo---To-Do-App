@@ -8,7 +8,8 @@ function AddTaskForm (props) {
     onSubmit,
     onChange,
     value,
-    nameInput 
+    nameInput,
+    helpText
   } = props
 
   return(
@@ -58,7 +59,14 @@ function AddTaskForm (props) {
                 value="Create task" 
               />
 
+              
+
             </form>
+
+            <div className='add-task_help-text'>
+              <span>{helpText}</span>
+            </div>
+
           </div>
         </div>
 
