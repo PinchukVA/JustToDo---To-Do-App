@@ -2,7 +2,7 @@ import React from 'react';
 
 import './AddTaskForm.scss';
 
-function AddTaskForm ({onSubmit, onChange, value, nameInput, helpText}) {
+function AddTaskForm ({onSubmit, onChange, value, nameInput, helpText, nameForm}) {
 
   return(
 
@@ -13,7 +13,7 @@ function AddTaskForm ({onSubmit, onChange, value, nameInput, helpText}) {
       <form 
         className="add-task__wraper" 
         onSubmit={onSubmit} 
-        
+        name={nameForm}
       >
 
         <label className="add-task__label" htmlFor="new-todo">

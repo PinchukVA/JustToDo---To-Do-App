@@ -29,12 +29,21 @@ function Tasks () {
   const appState = useSelector( state => state.Reducer)
   const { token,role,tasksList, tasksSearchList, isTaskSearch} = appState;
 
-  const [searchText, setSearchText] = useState('')
-  const [text, setText] = useState('')
-  const [helpText, setHelpText] = useState('')
+  const[textField, setTextField]=useState ({
+    text:'',
+    searchText:'',
+    editTask:''
+  })
+
+  const [helpFieldText, setHelpFieldText] = useState({
+    text:'',
+    editTask:''
+  })
+
   const [isRequest, setIsRequest] = useState(true)
   const [sessionFault, setSessionFault] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
+  const [editTaskId, setEditTaskId] = useState()
 
   const getLists = () =>{
 
@@ -68,22 +77,32 @@ function Tasks () {
     
   }
 
-  const patchTask = (taskID, IDchecked, taskListCopy, userId) =>{
-    
+  const patchTask = (taskID, taskListCopy, userId, typeBody='', IDchecked='',taskName='') =>{
+    let body ={}
     const accsesstoken = token;
-
-    const body = 
-      {
+    if (typeBody === 'checked'){
+       body = {
+          id: taskID,
+          userId: userId, 
+          checked: IDchecked
+       }
+    }else{
+      body = {
         id: taskID,
         userId: userId, 
-        checked: IDchecked
+        name: taskName
+     }
     }
+    console.log('patchTask--body', body)
 
     usersApi.PatchTasksForUser(body, accsesstoken)
       .then((response)=>{
         console.log('Ответ - на патч', response)
         if (response.data === 'OK'){
           dispatch(addTasksList(taskListCopy))
+          if (typeBody === 'name'){
+            handleCloseEditTask()
+          }
         }
         setIsRequest(false)
       },(error)=>{
@@ -99,22 +118,18 @@ function Tasks () {
     getLists()
   }, []);
 
+
   const handleChange = (e) => {
-
-    if (e.target.name === 'addTaskForm') {
-      setText(e.target.value);
-      setHelpText('')
-    }
-
-    if (e.target.name === 'searchTaskForm') {
-      setSearchText(e.target.value);
-    }
+    const textFieldCopy = {...textField}
+    textFieldCopy[e.target.name] = e.target.value
+    setTextField(textFieldCopy)
+    setHelpFieldText({})
   }
 
   const searchTask = (e) => {
     e.preventDefault();
     let taskListCopy = [...tasksList]
-    let copyText = searchText;
+    let copyText = textField.searchText;
     let searchArray = [];
 
     copyText = copyText.replace(/\s/g, '').toUpperCase();
@@ -157,11 +172,10 @@ function Tasks () {
     })
   }
 
-  const checkInput = () => {
-    
+  const checkInput = (e) => {
     let result = true;
     let arrayCopy = [...tasksList]
-    let copyText = text;
+    let copyText = textField[e.target.name];
 
     copyText = copyText.replace(/\s/g, '');
 
@@ -175,29 +189,17 @@ function Tasks () {
 
   const createTask = () =>{
 
-    let taskListCopy = [...tasksList]
-    let copyText = text;
-    let user_Id_Copy = user_Id;
+    const taskListCopy = [...tasksList]
+    const textFieldCopy ={...textField}
+    const copyText = textField.text;
+    const user_Id_Copy = user_Id;
 
-    const options = {
-      headers:{
-        authorization:`Bearer ${token}`
-      }
-    }
-
-    const body = 
-    {
-      checked:false,
-      name: copyText,
-      userId:user_Id_Copy
-    }
-
-  console.log('createTask- options--',options,'and body --', body)
     adminApi.createUserTask(copyText, user_Id_Copy, token)
       .then((response)=>{
-        if (response.data === 'Created'){
-          dispatch(addTasksList(taskListCopy.concat(body)))
-          setText('')
+        if (response.statusText === 'Created'){
+          dispatch(addTasksList(taskListCopy.concat(response.data)))
+          textFieldCopy.text = ''
+          setTextField(textFieldCopy)
         }
       },(error)=>{
         if (error.response.status === 401){
@@ -209,15 +211,27 @@ function Tasks () {
 
   const handleTaskSubmit = e => {
     e.preventDefault();
-    if ( text.trim().length < 4 ){
-      setHelpText('the minimum length of the task is 4 characters')
+
+    const helpFieldTextCopy = {...helpFieldText}
+
+    if ( textField[e.target.name].trim().length < 4 ){
+      helpFieldTextCopy[e.target.name] = 'the minimum length of the task is 4 characters'
+      setHelpFieldText(helpFieldTextCopy)
       return;
     }
-    if ( checkInput() ) {
-      setHelpText('task is already exist')
+
+    if ( checkInput(e) ) {
+      helpFieldTextCopy[e.target.name] = 'task already exists'
+      setHelpFieldText(helpFieldTextCopy)
       return; 
     }
-    createTask()
+
+    if ( e.target.name === 'text' ){
+      createTask()
+    }else{
+      editTask()
+    }
+    
   }
 
   const handleChangecheckBox = id => {
@@ -227,11 +241,31 @@ function Tasks () {
     changeObj.checked
       ? (changeObj.checked = false)
       : (changeObj.checked = true);
-    patchTask(id, changeObj.checked, taskListCopy, changeObj.userId)
+    patchTask(id, taskListCopy, changeObj.userId, 'checked', changeObj.checked)
   }
 
-  const handleOpenEditTask = () => {
-    console.log('handleOpenEditTask')
+  const handleOpenEditTask = (id) => {
+    const textFieldCopy = { ...textField}
+    const taskListCopy = [...tasksList];
+    const changeObj = taskListCopy.find((item) => item._id === id);
+    textFieldCopy.editTask=changeObj.name
+    setEditTaskId(id)
+    setTextField(textFieldCopy)
+    setIsEdit(!isEdit);
+  }
+
+  const editTask = () =>{
+    const taskListCopy = [...tasksList];
+    const textFieldCopy = { ...textField}
+    const changeObj = taskListCopy.find((item) => item._id === editTaskId);
+
+    changeObj.name = textFieldCopy.editTask
+    console.log('editTask--',changeObj )
+
+    patchTask(editTaskId, taskListCopy, changeObj.userId, 'name','',textFieldCopy.editTask)
+  }
+
+  const handleCloseEditTask = () => {
     setIsEdit(!isEdit);
   }
 
@@ -253,16 +287,13 @@ function Tasks () {
           onChange={() => handleChangecheckBox(item._id)}
           role={role}
           onClick={() => handleDeleteTask(item._id)}
-          handleClick={() => handleOpenEditTask()}
+          handleClick={() => handleOpenEditTask(item._id)}
         />
       ));
       return result;
     }
    return 
   }
-  console.log('FindState--', tasksList)
-
-  
 
   return (
     <>
@@ -276,15 +307,23 @@ function Tasks () {
 
         {isEdit && role==='admin' && 
         <EditForm
-          onClick={()=>handleOpenEditTask()}
+          onClick={()=>handleCloseEditTask()}
+          onChange = {handleChange}
+          value={textField.editTask}
+          nameInput='editTask'
+          formName = 'editTask'  
+          nameButton='editTaskButton'
+          helpEditText={helpFieldText.editTask}
+          onSubmit = {handleTaskSubmit}
         /> }
 
         {role==='admin' && !isTaskSearch && < AddTaskForm 
           onSubmit = {handleTaskSubmit}
           onChange = {handleChange}
-          nameInput = 'addTaskForm' 
-          helpText={helpText}
-          value={text}
+          nameInput = 'text'
+          nameForm = 'text'  
+          helpText={helpFieldText.text}
+          value={textField.text}
         />}
 
         
@@ -293,8 +332,8 @@ function Tasks () {
           placeholder = 'Find Task'
           onChange={handleChange}
           onSubmit={searchTask}
-          value={searchText}
-          nameInput = 'searchTaskForm' 
+          value={textField.searchText}
+          nameInput = 'searchText' 
         />
 
         <div className='tasks__wraper'>
