@@ -1,8 +1,15 @@
-@import '../../scss/Variables.scss';
-@import '../../scss/Extend.scss';
-@import '../../scss/Mixins.scss';
+@import '../../static/styles/Variables.scss';
+@import '../../static/styles/Extend.scss';
+@import '../../static/styles/Mixins.scss';
 
-.task-item {
+.task-item__wraper{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task-item__regular {
   padding: 15px 45px;
   border-radius: 5px;
   margin: 10px 0px;
@@ -13,6 +20,7 @@
   justify-content: space-between;
   background-color: $background-white;
   border: 1px solid $border-color-main;
+  transition: width 0.7s ease;
 }
 
 .item-id {
@@ -30,4 +38,39 @@
 .item-check {
   width: 20px;
   height: 20px;
+}
+
+.task-item__delete-button {
+  width:25%;
+  font-family: $font-family-second;
+  font-size: 14px;
+  border-style:none;
+  padding: 16px 8px;
+  margin: 0px 10px;
+  color: $text-white;
+  border-radius: 5px;
+  background-color: $background-mint;
+  text-transform: uppercase;
+  transition: 0.3s ease;
+  
+    &:hover{
+      cursor: pointer;
+      background-color: $background-delete;
+    }
+}
+
+.task__edit-button {
+  font-size:24px;
+  border-style:none;
+  color:$color-mint;
+  background:none;
+  transition: all 0.3s;
+  margin: 0px 10px;
+
+  &:hover {
+    cursor:pointer;
+    transform:scale(1.2);
+    color:$color-green;
+    transition: all 0.3s;
+  }
 }

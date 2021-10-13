@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { Link} from 'react-router-dom';
+import { Link, useHistory} from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import jwt from 'jsonwebtoken';
 
 import './SignIn.scss';
 
-import { Routes } from '../../utils/routes.js'
+import { signIn } from '../../redux/actions/Actions';
+import { setCookie } from '../../utils/Cookies'
+import { Routes, linkToRoute } from '../../utils/routes.js'
 import { authApi } from '../../api/AuthApi'
 import { 
     Preview,
@@ -12,6 +16,10 @@ import {
 } from '../../components'
 
 function SignIn () {
+
+    const dispatch = useDispatch();
+
+    const history = useHistory();
 
     const [loginForm, setLoginForm] = useState({nickNameValue:'', passwordValue:''})
     // Types form Errors 'empty', 'notValid', 'Exist'
@@ -57,6 +65,7 @@ function SignIn () {
     }
 
     const handleSubmitForm = async (event) => {
+        try{
         event.preventDefault();
         const loginFormCopy = {...loginForm};
 
@@ -72,11 +81,21 @@ function SignIn () {
         }
         //else we send Post request
         console.log('request send now')
-        try{
-            const res = await authApi.signInAuth(authUser)
-            const token = res.data.token
-            document.cookie = 'jwt' + '=' + token
+        
+        const res = await authApi.signInAuth(authUser)
+        const {token} = res.data
+        setCookie('authorization', token )
 
+        const decodeData = jwt.decode(token)
+        const {role, id:userId} = decodeData
+
+        dispatch(signIn({role, token, userId}))
+
+        if ( role === 'admin'){
+            linkToRoute(history, Routes.UsersRoute)
+        }else{
+            linkToRoute(history, Routes.TasksRoute)
+        }
         }catch(error){
             const loginFormErrorCopy = {...loginFormError};
             const errorMessage = error.response.data.message;

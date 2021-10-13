@@ -1,12 +1,10 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 
-import {SignIn } from '../../../pages'
-
 const NotAutorizedRoutes = (props ) => {
   const { component: Component, path} = props
   return(
-    <Route path={path}>
+    <Route exact path={path}>
             <Component />
       </Route>
   )

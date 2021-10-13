@@ -1,16 +1,21 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Redirect} from 'react-router-dom';
 
-import {Users } from '../../../pages'
 import { Navigation } from '../../../components'
+import { Routes } from '../../../utils/routes'
 
 const AutorizedRoutes = (props ) => {
-  const { component: Component, path} = props
+  const { component: Component, path, isAutorized, hasPermision} = props
   return(
     <>
-    <Navigation />
-    <Route path={path}>
-            <Component />
+    <Route exact path={path}>
+      { isAutorized && hasPermision ?
+        <>
+        <Navigation />
+        <Component />
+        </> : 
+        <Redirect to={Routes.SignInRoute} />
+      }      
       </Route>
     </>  
   )

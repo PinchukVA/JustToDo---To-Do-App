@@ -5,3 +5,7 @@ export const Routes = {
   UsersRoute: '/users',
   TasksRoute: '/tasks' 
 }
+
+export const linkToRoute = (history, route) => {
+  history.push(route)
+}

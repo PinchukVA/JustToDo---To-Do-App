@@ -1,0 +1,97 @@
+@import '../../static/styles/Variables.scss';
+@import '../../static/styles/Extend.scss';
+@import '../../static/styles/Mixins.scss';
+
+.edit__back {
+  background-color: $background-disabled;
+  opacity: 0.4;
+  min-width: 100%;
+  min-height: 100vh;
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit__content {
+  z-index: 200;
+  position: absolute;
+  top: 35%;
+  width: 90%;
+}
+
+.edit__wraper {
+  background-color: $background-second;
+  border: 1px solid $border-color-main;
+  color: $text-black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0px 20px;
+
+}
+
+.edit__label {
+  margin: 10px 0px;
+  font-size: 18px;
+}
+
+.edit__input {
+  @include form-input;
+  width: 90%;
+  margin: 10px 5px;
+}
+
+.edit__button {
+  width: 50%;
+  font-family:$font-family-second;
+  background-color: $color-mint;
+  border-style: none;
+  font-size: 16px;
+  color: $text-white;
+  padding: 6px;
+  font-weight: 700;
+  margin: 10px 0px;
+  transition: 0.3s;
+
+  &:hover {
+    cursor: pointer;
+    background-color: $color-green;
+    transition: 0.3s;
+  }
+}
+
+.edit_help-text{
+  font-family:$font-family-second;
+  margin: 15px auto;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 12px;
+  color: $color-error;
+}
+
+.edit__buttons-wraper {
+  width:100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit__close-button {
+  font-size:24px;
+  border-style:none;
+  color:$color-delete;
+  background-color:$background-second;
+  transition: transform 0.3s;
+  margin: 0px 25px;
+
+  &:hover {
+    cursor:pointer;
+    transform:scale(1.2);
+    transition: transform 0.3s;
+  }
+
+}

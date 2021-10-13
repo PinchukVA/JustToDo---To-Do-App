@@ -1,43 +1,65 @@
 import React  from 'react';
-
-
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 import './App.scss';
 import './Normalize.scss';
 
 import { Routes } from '../utils/routes.js'
-// import {AutorizedRoutes, NotAutorizedRoutes} from '../components/routes'
-import { SignUp, SignIn, Tasks, Users, Home } from '../pages'
-import { Navigation } from '../components/index.js'
+import {
+    AutorizedRoutes, 
+    NotAutorizedRoutes
+} from '../components/routes'
+import { 
+    SignUp, 
+    SignIn, 
+    Tasks, 
+    Users, 
+    Home 
+} from '../pages'
 
 function App() {
 
+  const {token, role} = useSelector( data => data.Reducer)
 
   return (
     <Router>
 
-            <Route exact path={Routes.HomeRoute}>
-                  <Home/>
-            </Route>
+            < NotAutorizedRoutes 
+                  path={Routes.HomeRoute}
+                  component = {Home}
+            />
 
-          <Route exact path={Routes.SignInRoute}>
-                <SignIn/>
-          </Route>
+            < NotAutorizedRoutes 
+                  path={Routes.SignInRoute}
+                  component = {SignIn}
+            />
 
-          <Route exact path={Routes.SignUpRoute}>
-                <SignUp/>
-          </Route>
+            < NotAutorizedRoutes 
+                  path={Routes.SignUpRoute}
+                  component = {SignUp}
+            />
 
-          <Route exact path={Routes.UsersRoute}>
-                <Navigation/>
-                <Users/>
-          </Route>
+            < AutorizedRoutes 
+                  path={Routes.UsersRoute}
+                  component = {Users}
+                  isAutorized = {Boolean(token)}
+                  hasPermision={role === 'admin'}
+            />
 
-          <Route exact path={Routes.TasksRoute}>
-                <Navigation/>
-                <Tasks/>
-          </Route>
+            < AutorizedRoutes 
+                  path={Routes.TasksRoute}
+                  component = {Tasks}
+                  isAutorized = {Boolean(token)}
+                  hasPermision={role === 'user'}
+            />
+
+            < AutorizedRoutes 
+                  path='/tasks/:user_Id'
+                  component = {Tasks}
+                  isAutorized = {Boolean(token)}
+                  hasPermision={role === 'admin'}
+            />
 
     </Router>
   );

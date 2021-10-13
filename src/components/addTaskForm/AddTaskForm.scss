@@ -1,0 +1,65 @@
+@import '../../static/styles/Variables.scss';
+@import '../../static/styles/Extend.scss';
+@import '../../static/styles/Mixins.scss';
+
+.users__form-wraper {
+  max-width: 720px;
+  width: 100%;
+  margin-top: 15px;
+  background: $background-second;
+  border-radius:5px;
+  border: 1px solid $border-color-main;
+}
+
+.acordion-item__content {
+  padding: 20px;
+  padding: 0 15px;
+}
+
+.add-task__wraper {
+  color: $text-black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0px 20px;
+
+}
+
+.add-task__label {
+  margin: 0px 10px;
+  font-size: 16px;
+}
+
+.add-task__input {
+  @include form-input;
+  max-width: 25%;
+  margin: 0px 10px;
+}
+
+.add-task__button {
+  width: 25%;
+  font-family:$font-family-second;
+  background-color: $color-mint;
+  border-style: none;
+  font-size: 16px;
+  color: $text-white;
+  padding: 6px;
+  font-weight: 700;
+  margin: 0px 10px;
+  transition: 0.3s;
+
+  &:hover {
+    cursor: pointer;
+    background-color: $color-green;
+    transition: 0.3s;
+  }
+}
+
+.add-task_help-text{
+  font-family:$font-family-second;
+  margin: 15px auto;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 12px;
+  color: $color-error;
+}
