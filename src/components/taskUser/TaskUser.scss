@@ -1,0 +1,33 @@
+@import '../../scss/Variables.scss';
+@import '../../scss/Extend.scss';
+@import '../../scss/Mixins.scss';
+
+.task-item {
+  padding: 15px 45px;
+  border-radius: 5px;
+  margin: 10px 0px;
+  width: 100%;
+  color: $text-black;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: $background-white;
+  border: 1px solid $border-color-main;
+}
+
+.item-id {
+  font-family: $font-family-second;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.item-name {
+  font-family:$font-family-second;
+  font-size: 16px;
+  max-width: 70%;
+}
+
+.item-check {
+  width: 20px;
+  height: 20px;
+}

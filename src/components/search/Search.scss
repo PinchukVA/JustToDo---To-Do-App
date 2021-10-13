@@ -1,0 +1,67 @@
+@import '../../scss/Variables.scss';
+@import '../../scss/Extend.scss';
+@import '../../scss/Mixins.scss';
+
+.search-wraper {
+  margin-top: 15px;
+  max-width: 720px;
+  width: 100%;
+  background-color: $color-mint;
+  border-style: none;
+  border-radius: 5px;
+}
+
+.search-form {
+  margin: 0px auto;
+  max-width: 540px;
+  display: flex;
+}
+
+.search-input {
+  width: 85%;
+  height: 49px;
+  margin: 10px 0px 10px 50px;
+  padding-left: 10px;
+  background-color: #fff;
+  border-radius: 7px 7px;
+  border-style: none;
+  font-size: 18px;
+  outline: none;
+  color: $text-grey;
+
+  &:focus{
+    border-bottom: 3px solid $border-color-main;
+  }
+}
+
+.search-button {
+  margin: 10px 10px 10px -50px;
+  width: 50px;
+  height: 50px;
+  border: none;
+  background: $color-green;
+  border-radius: 0 5px 5px 0;
+  transition: 0.3s;
+  font-size: 36px;
+  font-weight: bold;
+  color: #fff;
+
+  &:hover {
+    background: $background-hover;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+}
+
+.search-icon{
+  color:$text-white;
+  font-size: 26px;
+  right: 30px;
+  top: 3px;
+  position: relative;
+
+  &:hover {
+    cursor: pointer;
+    transition: 0.3s;
+  }
+}
