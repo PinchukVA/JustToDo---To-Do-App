@@ -7,6 +7,8 @@ import './Navigation.scss';
 
 import { Routes } from '../../utils/routes.js'
 import { signIn, addUsersList } from '../../redux/actions/Actions';
+import { authApi } from '../../api/AuthApi'
+import { setCookie } from '../../utils/Cookies'
 
 function Navigation () {
 
@@ -14,16 +16,26 @@ function Navigation () {
   const history = useHistory();
 
   const appState = useSelector( state => state.Reducer)
-  const {role} = appState;
+  const {role, token} = appState;
 
-  const clearState = () => {
-    const addTostate = {
-      token:'', 
-      role:'' 
+  const clearState = async () => {
+    try{
+     const accsesstoken = token;
+     const response = await authApi.logOut(accsesstoken)
+     if (response.data === 'OK'){
+      const addTostate = {
+        token:'', 
+        role:'' 
+      }
+      setCookie('authorization', '' )
+      dispatch(signIn(addTostate))
+      dispatch(addUsersList([]))
+      history.replace(Routes.SignInRoute)
+     }
     }
-    dispatch(signIn(addTostate))
-    dispatch(addUsersList([]))
-    history.replace(Routes.SignInRoute)
+    catch(error){
+      console.log(error)
+    }
   }
 
   return (
