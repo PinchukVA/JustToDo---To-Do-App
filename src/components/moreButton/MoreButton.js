@@ -5,10 +5,11 @@ import { faSync } from '@fortawesome/free-solid-svg-icons';
 import './MoreButton.scss';
 
 
-function MoreButton  () {
+function MoreButton  ({clickFunction}) {
   const [rotate, setRotate] = useState (false)
 
   const onClick = () =>{
+    clickFunction()
     setRotate(!rotate)
   }
 

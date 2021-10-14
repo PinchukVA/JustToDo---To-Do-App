@@ -46,14 +46,15 @@ function Tasks () {
   const [isEdit, setIsEdit] = useState(false)
   const [editTaskId, setEditTaskId] = useState()
   const [tasksCount, setTasksCount] = useState()
+  const [page, setPage] = useState(0)
 
   const getLists = () =>{
-
     const accsesstoken = token;
  
     const url = `http://localhost:3001/tasks/${user_Id}`
 
     if ( role === 'user'){
+      console.log('Check if user get tasks')
       usersApi.GetTasksForUser(accsesstoken)
       .then((response)=>{
         dispatch(addTasksList(response.data))
@@ -65,9 +66,12 @@ function Tasks () {
         console.log(error)
       })
     } else {
-      adminApi.GetTasksUserForAdmin(url,accsesstoken)
+      console.log('Check if Admin get tasks', page)
+      adminApi.GetTasksUserForAdmin(url,accsesstoken,page)
       .then((response)=>{
-        dispatch(addTasksList(response.data))
+        const tasksListNew = [...tasksList, ...response.data]
+        setPage(prevPage => prevPage + 1)
+        dispatch(addTasksList(tasksListNew))
         setIsRequest(false)
       },(error)=>{
         if (error.response.status === 401){
@@ -365,8 +369,8 @@ function Tasks () {
             {!isTaskSearch? renderTasks(tasksList) : renderTasks(tasksSearchList)}
             </ul>
 
-            {tasksCount !== 0 && <MoreButton 
-            // onClick={}
+            {tasksCount !== 0 && tasksCount !== tasksList.length && <MoreButton 
+            clickFunction={getLists}
             />}
 
         </div>

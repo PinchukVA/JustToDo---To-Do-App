@@ -25,7 +25,14 @@ function Navigation () {
      if (response.data === 'OK'){
       const addTostate = {
         token:'', 
-        role:'' 
+        role:'',
+        userId:'',
+        usersList: [],
+        usersSearchList: [],
+        tasksList: [],
+        tasksSearchList: [],
+        isUserSearch:false,
+        isTaskSearch:false 
       }
       setCookie('authorization', '' )
       dispatch(signIn(addTostate))
