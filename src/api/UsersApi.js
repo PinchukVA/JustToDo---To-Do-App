@@ -24,6 +24,13 @@ export const usersApi = {
         authorization:`Bearer ${token}`
       }
     })
-  }
+  },
 
+  GetCountForUser:  async (token) =>{
+    return   axios.get('http://localhost:3001/tasks/count', {
+      headers:{
+        authorization:`Bearer ${token}`
+      }
+    })
+  }
 }

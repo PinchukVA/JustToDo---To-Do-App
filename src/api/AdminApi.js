@@ -41,5 +41,13 @@ export const adminApi = {
         authorization:`Bearer ${token}`
       }
     })
+  },
+
+  GetCountForAdmin:  (url, token) =>{
+    return   axios.get(url, {
+      headers:{
+        authorization:`Bearer ${token}`
+      }
+    })
   }
 }

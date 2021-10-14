@@ -44,6 +44,7 @@ function Tasks () {
   const [sessionFault, setSessionFault] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [editTaskId, setEditTaskId] = useState()
+  const [tasksCount, setTasksCount] = useState()
 
   const getLists = () =>{
 
@@ -113,9 +114,29 @@ function Tasks () {
       })
   }
 
+  const getCounts  = async () =>{
+    try{
+      const accsesstoken = token;
+      const url = `http://localhost:3001/tasks/count/${user_Id}`
+      if ( role === 'user'){
+        const response = await usersApi.GetCountForUser(accsesstoken)
+        const count = response.data
+        setTasksCount(count.tasksCount)
+      }else{
+        const response = await adminApi.GetCountForAdmin(url,accsesstoken)
+        const count = response.data
+        setTasksCount(count.tasksCount)
+      }
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
+
   useEffect(  () => {
     setSessionFault(false)
     getLists()
+    getCounts()
   }, []);
 
 
