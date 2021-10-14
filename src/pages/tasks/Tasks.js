@@ -48,39 +48,27 @@ function Tasks () {
   const [tasksCount, setTasksCount] = useState()
   const [page, setPage] = useState(0)
 
-  const getLists = () =>{
-    const accsesstoken = token;
- 
-    const url = `http://localhost:3001/tasks/${user_Id}`
-
-    if ( role === 'user'){
-      console.log('Check if user get tasks')
-      usersApi.GetTasksForUser(accsesstoken)
-      .then((response)=>{
-        dispatch(addTasksList(response.data))
-        setIsRequest(false)
-      },(error)=>{
-        if (error.response.status === 401){
-                setSessionFault(true)
-              }
-        console.log(error)
-      })
-    } else {
-      console.log('Check if Admin get tasks', page)
-      adminApi.GetTasksUserForAdmin(url,accsesstoken,page)
-      .then((response)=>{
-        const tasksListNew = [...tasksList, ...response.data]
-        setPage(prevPage => prevPage + 1)
-        dispatch(addTasksList(tasksListNew))
-        setIsRequest(false)
-      },(error)=>{
-        if (error.response.status === 401){
-                setSessionFault(true)
-              }
-        console.log(error)
-      })
+  const getLists = async () =>{
+    try{
+      const accsesstoken = token;
+      const url = `http://localhost:3001/tasks/${user_Id}`
+      let response;
+      if ( role === 'user'){
+        response = await usersApi.GetTasksForUser(accsesstoken,page)
+      } else {
+        response = await adminApi.GetTasksUserForAdmin(url,accsesstoken,page)
+      }
+      console.log('getLists --response ---ans user_role', response, role)
+      const tasksListNew = [...tasksList, ...response.data]
+      setPage(prevPage => prevPage + 1)
+      dispatch(addTasksList(tasksListNew))
+      setIsRequest(false)
+    }catch(error){
+      if (error.response.status === 401){
+        setSessionFault(true)
+      }
+      console.log(error)
     }
-    
   }
 
   const patchTask = (taskID, taskListCopy, userId, typeBody='', IDchecked='',taskName='') =>{
@@ -123,15 +111,14 @@ function Tasks () {
     try{
       const accsesstoken = token;
       const url = `http://localhost:3001/tasks/count/${user_Id}`
+      let response;
       if ( role === 'user'){
-        const response = await usersApi.GetCountForUser(accsesstoken)
-        const count = response.data
-        setTasksCount(count.tasksCount)
+        response = await usersApi.GetCountForUser(accsesstoken)
       }else{
-        const response = await adminApi.GetCountForAdmin(url,accsesstoken)
-        const count = response.data
-        setTasksCount(count.tasksCount)
+        response = await adminApi.GetCountForAdmin(url,accsesstoken)
       }
+      const count = response.data
+      setTasksCount(count.tasksCount)
     }
     catch(error){
       console.log(error)
@@ -223,7 +210,6 @@ function Tasks () {
     adminApi.createUserTask(copyText, user_Id_Copy, token)
       .then((response)=>{
         if (response.statusText === 'Created'){
-          dispatch(addTasksList(taskListCopy.concat(response.data)))
           textFieldCopy.text = ''
           setTextField(textFieldCopy)
         }
@@ -320,7 +306,7 @@ function Tasks () {
     }
    return 
   }
-
+  console.log('count all', tasksCount)
   return (
     <>
       <section className='tasks__section'>

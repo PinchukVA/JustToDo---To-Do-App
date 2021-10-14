@@ -10,10 +10,14 @@ export const usersApi = {
     return  axios.post('http://localhost:3001/user/exists', body)
   },
 
-  GetTasksForUser:  (token) =>{
+  GetTasksForUser:  async (token,pageNumber) =>{
     return   axios.get('http://localhost:3001/tasks', {
       headers:{
         authorization:`Bearer ${token}`
+      },
+      params:{
+        pageSize:2,
+        pageNumber: pageNumber
       }
     })
   },

@@ -10,15 +10,7 @@ export const adminApi = {
     })
   },
 
-  // GetTasksUserForAdmin:  (url, token) =>{
-  //   return   axios.get(url, {
-  //     headers:{
-  //       authorization:`Bearer ${token}`
-  //     }
-  //   })
-  // },
-
-  GetTasksUserForAdmin:  (url, token,pageNumber) =>{
+  GetTasksUserForAdmin: async (url, token,pageNumber) =>{
     return   axios.get(url, {
       headers:{
         authorization:`Bearer ${token}`
