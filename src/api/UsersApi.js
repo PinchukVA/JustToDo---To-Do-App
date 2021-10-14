@@ -22,7 +22,7 @@ export const usersApi = {
     })
   },
 
-  PatchTasksForUser:  (body, token) =>{
+  PatchTasksForUser:  async (body, token) =>{
     return   axios.patch('http://localhost:3001/tasks',body, {
       headers:{
         authorization:`Bearer ${token}`

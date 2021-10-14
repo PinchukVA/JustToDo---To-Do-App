@@ -324,7 +324,6 @@ function SignUp () {
         {okSignUp && <PopUpLink 
           text = {linkText}
           buttonText = 'Sign in'
-          link = 'SignInRoute'
         />}
         
         <div className='signUp-form_main'>

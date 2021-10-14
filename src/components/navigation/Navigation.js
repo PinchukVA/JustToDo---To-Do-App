@@ -48,6 +48,7 @@ function Navigation () {
   return (
     <>
       <nav className='navigation-nav'>
+        <h1>Just ToDo It</h1>
         <ul className='navigation-list'>
 
           { role === 'admin' && <Link to={Routes.UsersRoute} 
@@ -58,6 +59,7 @@ function Navigation () {
 
           <li><span onClick = {clearState} >Sign Out</span></li>
        </ul>
+
      </nav>
     </>
   )

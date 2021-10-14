@@ -108,7 +108,6 @@ function Users () {
         {sessionFault && <PopUpLink 
           text = 'The time of the session has expired. Log in again'
           buttonText = 'Sign in'
-          link = 'SignInRoute'
         />}
 
         <Search

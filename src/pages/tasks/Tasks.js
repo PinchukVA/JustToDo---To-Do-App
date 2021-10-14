@@ -5,20 +5,23 @@ import { useParams } from 'react-router-dom'
 import './Tasks.scss';
 import preloader_L from '../../static/images/svg/preloader_L.svg';
 
+import { setCookie } from '../../utils/Cookies'
 import {  
+  signIn,
   addTasksList,
   addTasksSearchList,
   addTaskSearch 
 } from '../../redux/actions/Actions';
 import { usersApi } from '../../api/UsersApi'
 import { adminApi } from '../../api/AdminApi'
+import { authApi } from '../../api/AuthApi'
 import { 
   Search,
   TaskUser,
   AddTaskForm,
   PopUpLink, 
   EditForm,
-  MoreButton
+  MoreButton,
 } from '../../components'
 
 function Tasks () {
@@ -71,40 +74,47 @@ function Tasks () {
     }
   }
 
-  const patchTask = (taskID, taskListCopy, userId, typeBody='', IDchecked='',taskName='') =>{
-    let body ={}
-    const accsesstoken = token;
-    if (typeBody === 'checked'){
-       body = {
+  const patchTask = async (taskID, taskListCopy, userId, typeBody='', IDchecked='',taskName='') =>{
+    try{
+      let body ={}
+      const accsesstoken = token;
+      if (typeBody === 'checked'){
+         body = {
+            id: taskID,
+            userId: userId, 
+            checked: IDchecked
+         }
+      }else{
+        body = {
           id: taskID,
           userId: userId, 
-          checked: IDchecked
+          name: taskName
        }
-    }else{
-      body = {
-        id: taskID,
-        userId: userId, 
-        name: taskName
-     }
-    }
-    console.log('patchTask--body', body)
-
-    usersApi.PatchTasksForUser(body, accsesstoken)
-      .then((response)=>{
-        console.log('Ответ - на патч', response)
-        if (response.data === 'OK'){
-          dispatch(addTasksList(taskListCopy))
-          if (typeBody === 'name'){
-            handleCloseEditTask()
-          }
+      }
+      console.log('patchTask--body', body)
+  
+      const response = await usersApi.PatchTasksForUser(body, accsesstoken)
+      if (response.data === 'OK'){
+        console.log('patchTask - checkDispatch',)
+        dispatch(addTasksList(taskListCopy))
+        if (typeBody === 'name'){
+          handleCloseEditTask()
         }
-        setIsRequest(false)
-      },(error)=>{
-        if (error.response.status === 401){
-                setSessionFault(true)
-              }
-        console.log(error)
-      })
+      }
+      setIsRequest(false)
+    }catch(error){
+      console.log(error)
+      const  res  = {...error.response.data}
+      console.log(res)
+      if (error.response.status === 401){
+        setSessionFault(true)
+      }
+      if (res.status === "Fail"){
+        const helpFieldTextCopy = {...helpFieldText}
+        helpFieldTextCopy.editTask = res.message
+        setHelpFieldText(helpFieldTextCopy)
+      }
+    }
   }
 
   const getCounts  = async () =>{
@@ -130,7 +140,6 @@ function Tasks () {
     getLists()
     getCounts()
   }, []);
-
 
   const handleChange = (e) => {
     const textFieldCopy = {...textField}
@@ -158,67 +167,52 @@ function Tasks () {
 
   }
 
-  const handleDeleteTask = id => {
-
-    const accsesstoken = token;
-
-    let user_Id_Copy = user_Id;
-    let tasksListCopy = [...tasksList]
-    let tasksSearchListCopy = [...tasksSearchList]
-
-
-    let delId = tasksListCopy.findIndex((item) => item._id === id);
-    let delIdSearch = tasksSearchListCopy.findIndex((item) => item._id === id);
-
-    tasksListCopy.splice(delId, 1);
-    tasksSearchListCopy.splice(delIdSearch, 1);
-
-    adminApi.deleteUserTask(id, user_Id_Copy, accsesstoken)
-    .then((response)=>{
+  const handleDeleteTask = async (id) => {
+    try{
+      const accsesstoken = token;
+      let user_Id_Copy = user_Id;
+      let tasksListCopy = [...tasksList]
+      let tasksSearchListCopy = [...tasksSearchList]
+      let delId = tasksListCopy.findIndex((item) => item._id === id);
+      let delIdSearch = tasksSearchListCopy.findIndex((item) => item._id === id);
+      tasksListCopy.splice(delId, 1);
+      tasksSearchListCopy.splice(delIdSearch, 1);
+      const response = await adminApi.deleteUserTask(id, user_Id_Copy, accsesstoken)
       if (response.status === 204){
-      dispatch(addTasksList(tasksListCopy))
-      dispatch(addTasksSearchList(tasksSearchListCopy))
-      }
-    },(error)=>{
+        dispatch(addTasksList(tasksListCopy))
+        dispatch(addTasksSearchList(tasksSearchListCopy))
+        getCounts()
+        }
+    }catch(error){
       console.log(error.response.status)
       console.log(error)
-    })
-  }
-
-  const checkInput = (e) => {
-    let result = true;
-    let arrayCopy = [...tasksList]
-    let copyText = textField[e.target.name];
-
-    copyText = copyText.replace(/\s/g, '');
-
-    let index = arrayCopy.findIndex(item => item.name.replace(/\s/g, '') === copyText);
-
-    if (index === -1){
-      result = false
     }
-    return result;
   }
 
-  const createTask = () =>{
-
-    const taskListCopy = [...tasksList]
-    const textFieldCopy ={...textField}
-    const copyText = textField.text;
-    const user_Id_Copy = user_Id;
-
-    adminApi.createUserTask(copyText, user_Id_Copy, token)
-      .then((response)=>{
-        if (response.statusText === 'Created'){
-          textFieldCopy.text = ''
-          setTextField(textFieldCopy)
-        }
-      },(error)=>{
-        if (error.response.status === 401){
-                setSessionFault(true)
-              }
-        console.log(error)
-      })
+  const createTask = async () =>{
+    try{
+      const textFieldCopy ={...textField}
+      const copyText = textField.text;
+      const user_Id_Copy = user_Id;
+      const response = await adminApi.createUserTask(copyText, user_Id_Copy, token)
+  
+      if (response.statusText === 'Created'){
+        textFieldCopy.text = ''
+        setTextField(textFieldCopy)
+        getCounts()
+      }
+    }catch(error){
+      console.log(error)
+      const  res  = {...error.response.data}
+      if (error.response.status === 401){
+        setSessionFault(true)
+      }
+      if (res.status === "Fail"){
+        const helpFieldTextCopy = {...helpFieldText}
+        helpFieldTextCopy.text = res.message
+        setHelpFieldText(helpFieldTextCopy)
+      }
+    }
   }
 
   const handleTaskSubmit = e => {
@@ -230,12 +224,6 @@ function Tasks () {
       helpFieldTextCopy[e.target.name] = 'the minimum length of the task is 4 characters'
       setHelpFieldText(helpFieldTextCopy)
       return;
-    }
-
-    if ( checkInput(e) ) {
-      helpFieldTextCopy[e.target.name] = 'task already exists'
-      setHelpFieldText(helpFieldTextCopy)
-      return; 
     }
 
     if ( e.target.name === 'text' ){
@@ -272,7 +260,6 @@ function Tasks () {
     const changeObj = taskListCopy.find((item) => item._id === editTaskId);
 
     changeObj.name = textFieldCopy.editTask
-    console.log('editTask--',changeObj )
 
     patchTask(editTaskId, taskListCopy, changeObj.userId, 'name','',textFieldCopy.editTask)
   }
@@ -307,6 +294,9 @@ function Tasks () {
    return 
   }
   console.log('count all', tasksCount)
+
+  
+
   return (
     <>
       <section className='tasks__section'>
@@ -314,7 +304,6 @@ function Tasks () {
         {sessionFault && <PopUpLink 
           text = 'The time of the session has expired. Log in again'
           buttonText = 'Sign in'
-          link = 'SignInRoute'
         />}
 
         {isEdit && role==='admin' && 
@@ -348,16 +337,23 @@ function Tasks () {
           nameInput = 'searchText' 
         />
 
-        <div className='tasks__wraper'>
-            
-            <ul className='tasks-list'>
-            {isRequest &&<img src={preloader_L}/>}
-            {!isTaskSearch? renderTasks(tasksList) : renderTasks(tasksSearchList)}
-            </ul>
+        
 
-            {tasksCount !== 0 && tasksCount !== tasksList.length && <MoreButton 
-            clickFunction={getLists}
-            />}
+        <div className='tasks__wraper'>
+          
+          { tasksList.length !== 0  && <div className ='tasks__count' >
+            show <span>{tasksList.length}</span > 
+            tasks out of  <span>{tasksCount}</span>
+          </div>}
+
+          <ul className='tasks-list'>
+          {isRequest &&<img src={preloader_L}/>}
+          {!isTaskSearch? renderTasks(tasksList) : renderTasks(tasksSearchList)}
+          </ul>
+
+          {tasksCount !== 0 && tasksCount !== tasksList.length && !isRequest && <MoreButton 
+          clickFunction={getLists}
+          />}
 
         </div>
 

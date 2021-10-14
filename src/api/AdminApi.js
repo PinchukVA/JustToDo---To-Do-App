@@ -22,7 +22,7 @@ export const adminApi = {
     })
   },
 
-  deleteUserTask:  (id,user_Id,token) =>{
+  deleteUserTask:  async (id,user_Id,token) =>{
     return   axios.delete('http://localhost:3001/tasks',{
       data:{
           id: id,
@@ -34,7 +34,7 @@ export const adminApi = {
     })
   },
 
-  createUserTask:  (name,userId,token) =>{
+  createUserTask: async (name,userId,token) =>{
     return   axios.post('http://localhost:3001/tasks',
     {
       name: name,

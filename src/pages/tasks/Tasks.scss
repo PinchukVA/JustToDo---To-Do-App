@@ -16,6 +16,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+
 }
 
 .tasks-list{
@@ -23,8 +24,28 @@
   display: flex;
   flex-direction: column;
   padding: 3px;
+  margin: 2px 5px;
 }
 
 .list-empty {
   @include message-empty;
+}
+
+.tasks__count {
+  margin: 5px 10px 0px 10px;
+  padding: 7px;
+  font-family: $font-family-second;
+  color:$text-black;
+  font-size:10px;
+  text-transform: uppercase;
+  background-color: $background-white;
+  border-radius: 3px;
+  max-width:25%;
+  border: 1px solid $border-color-main;
+
+  span {
+    color:$text-black;
+    margin:0px 3px;
+    font-weight:bold;
+  }
 }
