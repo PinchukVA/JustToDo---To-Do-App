@@ -17,7 +17,8 @@ import {
   TaskUser,
   AddTaskForm,
   PopUpLink, 
-  EditForm
+  EditForm,
+  MoreButton
 } from '../../components'
 
 function Tasks () {
@@ -363,6 +364,11 @@ function Tasks () {
             {isRequest &&<img src={preloader_L}/>}
             {!isTaskSearch? renderTasks(tasksList) : renderTasks(tasksSearchList)}
             </ul>
+
+            {tasksCount !== 0 && <MoreButton 
+            // onClick={}
+            />}
+
         </div>
 
       </section>

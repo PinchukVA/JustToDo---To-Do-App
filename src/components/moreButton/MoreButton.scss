@@ -1,0 +1,38 @@
+@import '../../static/styles/Variables.scss';
+@import '../../static/styles/Extend.scss';
+@import '../../static/styles/Mixins.scss';
+
+.moreButton {
+  margin: 2px auto;
+  padding: 10px 15px;
+  background-color: $background-second;
+  font-family: $font-family-second;
+  color:$text-black;
+  border-radius:5px;
+  border:1px solid $border-color-main;
+  font-size:12px;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  width: 150px;
+
+  &:hover {
+   cursor: pointer;
+   background-color: $background-mint;
+   color:$text-white;
+   transition: all 0.3s;
+  }
+}
+
+.moreButton__icon {
+  margin: 0px 5px;
+  // transform: rotate(0deg);
+  transition: transform 0.5s ease-in-out;
+}
+
+.moreButton__icon-rotate {
+  -ms-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  transform: rotate(360deg);
+  transition: transform 0.5s ease-in-out;
+  margin: 0px 5px;
+}
