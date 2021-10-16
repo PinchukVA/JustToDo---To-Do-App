@@ -10,14 +10,15 @@ export const adminApi = {
     })
   },
 
-  GetTasksUserForAdmin: async (url, token,pageNumber) =>{
-    return   axios.get(url, {
+  GetTasksUserForAdmin: async (user_Id, token,pageNumber,searchName) =>{
+    return   axios.get(`http://localhost:3001/tasks/${user_Id}`, {
       headers:{
         authorization:`Bearer ${token}`
       },
       params:{
         pageSize:2,
-        pageNumber: pageNumber
+        pageNumber: pageNumber,
+        searchName:searchName
       }
     })
   },
@@ -47,10 +48,13 @@ export const adminApi = {
     })
   },
 
-  GetCountForAdmin:  (url, token) =>{
-    return   axios.get(url, {
+  GetCountForAdmin:  (user_Id, token,searchName) =>{
+    return   axios.get(`http://localhost:3001/tasks/count/${user_Id}`, {
       headers:{
         authorization:`Bearer ${token}`
+      },
+      params:{
+        searchName:searchName
       }
     })
   }

@@ -10,14 +10,15 @@ export const usersApi = {
     return  axios.post('http://localhost:3001/user/exists', body)
   },
 
-  GetTasksForUser:  async (token,pageNumber) =>{
+  GetTasksForUser:  async (token,pageNumber,searchName) =>{
     return   axios.get('http://localhost:3001/tasks', {
       headers:{
         authorization:`Bearer ${token}`
       },
       params:{
         pageSize:2,
-        pageNumber: pageNumber
+        pageNumber: pageNumber,
+        searchName:searchName
       }
     })
   },
@@ -30,10 +31,13 @@ export const usersApi = {
     })
   },
 
-  GetCountForUser:  async (token) =>{
+  GetCountForUser:  async (token,searchName) =>{
     return   axios.get('http://localhost:3001/tasks/count', {
       headers:{
         authorization:`Bearer ${token}`
+      },
+      params:{
+        searchName:searchName
       }
     })
   }

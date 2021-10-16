@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom'
 
 import './Tasks.scss';
 import preloader_L from '../../static/images/svg/preloader_L.svg';
 
-import { setCookie } from '../../utils/Cookies'
-import {  
-  signIn,
-  addTasksList,
-  addTasksSearchList,
-  addTaskSearch 
-} from '../../redux/actions/Actions';
 import { usersApi } from '../../api/UsersApi'
 import { adminApi } from '../../api/AdminApi'
-import { authApi } from '../../api/AuthApi'
 import { 
   Search,
   TaskUser,
@@ -28,10 +20,8 @@ function Tasks () {
 
   const {user_Id } = useParams();
 
-  const dispatch = useDispatch();
-
   const appState = useSelector( state => state.Reducer)
-  const { token,role,tasksList, tasksSearchList, isTaskSearch} = appState;
+  const { token,role} = appState;
 
   const[textField, setTextField]=useState ({
     text:'',
@@ -50,22 +40,24 @@ function Tasks () {
   const [editTaskId, setEditTaskId] = useState()
   const [tasksCount, setTasksCount] = useState()
   const [page, setPage] = useState(0)
+  const [tasksList, setTasksList] = useState([])
 
   const getLists = async () =>{
     try{
-      const accsesstoken = token;
-      const url = `http://localhost:3001/tasks/${user_Id}`
-      let response;
+      const {searchText} = {...textField}
+      let res;
       if ( role === 'user'){
-        response = await usersApi.GetTasksForUser(accsesstoken,page)
+        res= await usersApi.GetTasksForUser(token,page,searchText)
       } else {
-        response = await adminApi.GetTasksUserForAdmin(url,accsesstoken,page)
+        res = await adminApi.GetTasksUserForAdmin(user_Id,token,page,searchText)
       }
-      console.log('getLists --response ---ans user_role', response, role)
-      const tasksListNew = [...tasksList, ...response.data]
-      setPage(prevPage => prevPage + 1)
-      dispatch(addTasksList(tasksListNew))
-      setIsRequest(false)
+      console.log('getLists -res', res.status)
+      if (res.status === 200){
+        const tasksListNew = [...tasksList, ...res.data]
+        setPage(prevPage => prevPage + 1)
+        setTasksList(tasksListNew)
+        setIsRequest(false)
+      }
     }catch(error){
       if (error.response.status === 401){
         setSessionFault(true)
@@ -74,30 +66,33 @@ function Tasks () {
     }
   }
 
-  const patchTask = async (taskID, taskListCopy, userId, typeBody='', IDchecked='',taskName='') =>{
+  const patchTask = async (taskID, patchType) =>{
     try{
+      const textFieldCopy = { ...textField}
+      const taskListCopy = [...tasksList];
+      const changeObj = taskListCopy.find((item) => item._id === taskID);
       let body ={}
-      const accsesstoken = token;
-      if (typeBody === 'checked'){
+      if (patchType === 'checked'){
          body = {
             id: taskID,
-            userId: userId, 
-            checked: IDchecked
+            userId: user_Id, 
+            checked: changeObj.checked
+            ? (changeObj.checked = false)
+            : (changeObj.checked = true)
          }
       }else{
         body = {
           id: taskID,
-          userId: userId, 
-          name: taskName
+          userId: user_Id, 
+          name: textFieldCopy.editTask.trim()
        }
       }
-      console.log('patchTask--body', body)
-  
-      const response = await usersApi.PatchTasksForUser(body, accsesstoken)
+      const response = await usersApi.PatchTasksForUser(body, token)
       if (response.data === 'OK'){
-        console.log('patchTask - checkDispatch',)
-        dispatch(addTasksList(taskListCopy))
-        if (typeBody === 'name'){
+        setTasksList(taskListCopy)
+        if (patchType === 'name'){
+          changeObj.name = textFieldCopy.editTask
+          setTasksList(taskListCopy)
           handleCloseEditTask()
         }
       }
@@ -119,13 +114,12 @@ function Tasks () {
 
   const getCounts  = async () =>{
     try{
-      const accsesstoken = token;
-      const url = `http://localhost:3001/tasks/count/${user_Id}`
+      const {searchText} = {...textField}
       let response;
       if ( role === 'user'){
-        response = await usersApi.GetCountForUser(accsesstoken)
+        response = await usersApi.GetCountForUser(token,searchText)
       }else{
-        response = await adminApi.GetCountForAdmin(url,accsesstoken)
+        response = await adminApi.GetCountForAdmin(user_Id,token,searchText)
       }
       const count = response.data
       setTasksCount(count.tasksCount)
@@ -150,37 +144,35 @@ function Tasks () {
 
   const searchTask = (e) => {
     e.preventDefault();
-    let taskListCopy = [...tasksList]
     let copyText = textField.searchText;
-    let searchArray = [];
+    const textFieldCopy = {...textField}
+    
+    setTasksList([])
 
-    copyText = copyText.replace(/\s/g, '').toUpperCase();
-    searchArray = taskListCopy.filter(item => item.name.replace(/\s/g, '').toUpperCase().includes(copyText) === true);
-
-    dispatch(addTasksSearchList([...searchArray]));
-    dispatch(addTaskSearch(!isTaskSearch));
+    getCounts()
+    getLists()
 
     if (copyText === '' ){
-      dispatch(addTaskSearch(false));
-      dispatch(addTasksSearchList([]));
+      textFieldCopy.searchText = ''
+      setTasksList([])
+      setTextField(textFieldCopy)
     }
 
   }
 
   const handleDeleteTask = async (id) => {
     try{
-      const accsesstoken = token;
       let user_Id_Copy = user_Id;
       let tasksListCopy = [...tasksList]
-      let tasksSearchListCopy = [...tasksSearchList]
+
       let delId = tasksListCopy.findIndex((item) => item._id === id);
-      let delIdSearch = tasksSearchListCopy.findIndex((item) => item._id === id);
+
       tasksListCopy.splice(delId, 1);
-      tasksSearchListCopy.splice(delIdSearch, 1);
-      const response = await adminApi.deleteUserTask(id, user_Id_Copy, accsesstoken)
+
+      const response = await adminApi.deleteUserTask(id, user_Id_Copy, token)
       if (response.status === 204){
-        dispatch(addTasksList(tasksListCopy))
-        dispatch(addTasksSearchList(tasksSearchListCopy))
+        setTasksList(tasksListCopy)
+
         getCounts()
         }
     }catch(error){
@@ -192,7 +184,7 @@ function Tasks () {
   const createTask = async () =>{
     try{
       const textFieldCopy ={...textField}
-      const copyText = textField.text;
+      const copyText = textField.text.trim();
       const user_Id_Copy = user_Id;
       const response = await adminApi.createUserTask(copyText, user_Id_Copy, token)
   
@@ -229,19 +221,8 @@ function Tasks () {
     if ( e.target.name === 'text' ){
       createTask()
     }else{
-      editTask()
+      patchTask(editTaskId, 'name')
     }
-    
-  }
-
-  const handleChangecheckBox = id => {
-    const taskListCopy = [...tasksList];
-    const changeObj = taskListCopy.find((item) => item._id === id);
-
-    changeObj.checked
-      ? (changeObj.checked = false)
-      : (changeObj.checked = true);
-    patchTask(id, taskListCopy, changeObj.userId, 'checked', changeObj.checked)
   }
 
   const handleOpenEditTask = (id) => {
@@ -252,16 +233,6 @@ function Tasks () {
     setEditTaskId(id)
     setTextField(textFieldCopy)
     setIsEdit(!isEdit);
-  }
-
-  const editTask = () =>{
-    const taskListCopy = [...tasksList];
-    const textFieldCopy = { ...textField}
-    const changeObj = taskListCopy.find((item) => item._id === editTaskId);
-
-    changeObj.name = textFieldCopy.editTask
-
-    patchTask(editTaskId, taskListCopy, changeObj.userId, 'name','',textFieldCopy.editTask)
   }
 
   const handleCloseEditTask = () => {
@@ -283,7 +254,7 @@ function Tasks () {
           key={item._id}
           item={item}
           taskId = {arr.indexOf(item)+1}
-          onChange={() => handleChangecheckBox(item._id)}
+          onChange={() => patchTask(item._id, 'checked')}
           role={role}
           onClick={() => handleDeleteTask(item._id)}
           handleClick={() => handleOpenEditTask(item._id)}
@@ -293,9 +264,6 @@ function Tasks () {
     }
    return 
   }
-  console.log('count all', tasksCount)
-
-  
 
   return (
     <>
@@ -318,7 +286,7 @@ function Tasks () {
           onSubmit = {handleTaskSubmit}
         /> }
 
-        {role==='admin' && !isTaskSearch && < AddTaskForm 
+        {role==='admin' && < AddTaskForm 
           onSubmit = {handleTaskSubmit}
           onChange = {handleChange}
           nameInput = 'text'
@@ -327,8 +295,6 @@ function Tasks () {
           value={textField.text}
         />}
 
-        
-
         <Search
           placeholder = 'Find Task'
           onChange={handleChange}
@@ -336,8 +302,6 @@ function Tasks () {
           value={textField.searchText}
           nameInput = 'searchText' 
         />
-
-        
 
         <div className='tasks__wraper'>
           
@@ -348,7 +312,7 @@ function Tasks () {
 
           <ul className='tasks-list'>
           {isRequest &&<img src={preloader_L}/>}
-          {!isTaskSearch? renderTasks(tasksList) : renderTasks(tasksSearchList)}
+          {renderTasks(tasksList)}
           </ul>
 
           {tasksCount !== 0 && tasksCount !== tasksList.length && !isRequest && <MoreButton 
