@@ -16,7 +16,7 @@ export const usersApi = {
         authorization:`Bearer ${token}`
       },
       params:{
-        pageSize:2,
+        pageSize:1,
         pageNumber: pageNumber,
         searchName:searchName
       }

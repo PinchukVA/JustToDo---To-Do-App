@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import './Navigation.scss';
 
 import { Routes } from '../../utils/routes.js'
-import { signIn, addUsersList } from '../../redux/actions/Actions';
+import { signIn } from '../../redux/actions/Actions';
 import { authApi } from '../../api/AuthApi'
 import { setCookie } from '../../utils/Cookies'
 
@@ -26,17 +26,10 @@ function Navigation () {
       const addTostate = {
         token:'', 
         role:'',
-        userId:'',
-        usersList: [],
-        usersSearchList: [],
-        tasksList: [],
-        tasksSearchList: [],
-        isUserSearch:false,
-        isTaskSearch:false 
+        userId:''
       }
       setCookie('authorization', '' )
       dispatch(signIn(addTostate))
-      dispatch(addUsersList([]))
       history.replace(Routes.SignInRoute)
      }
     }

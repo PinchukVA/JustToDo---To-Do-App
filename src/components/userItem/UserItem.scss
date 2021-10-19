@@ -5,21 +5,23 @@
 
 .user-item {
   font-family: $font-family-second;
-  padding: 15px 45px;
-  border-radius: 5px;
-  margin: 10px 0px;
+  margin: 2px auto;
+  padding: 10px 15px;
+  color:$text-grey;
+  border-radius:5px;
   width: 100%;
-  color: $text-white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: $background-mint;
+  background-color: $background-second;
+  border:1px solid $border-color-main;
   transition: 0.3s;
 
   &:hover{
     cursor: pointer;
-    background-color: $background-green;
-    transition: 0.3s;
+   background-color: $background-mint;
+   color:$text-white;
+   transition: all 0.3s;
   }
 }
 

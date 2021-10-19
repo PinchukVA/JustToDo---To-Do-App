@@ -2,21 +2,35 @@ import axios from 'axios'
 
 export const adminApi = {
 
-  getUsersForAdmin:  (token) =>{
-    return  axios.get('http://localhost:3001/users', {
+  getUsersForAdmin: async (token,pageNumber,searchName) =>{
+    return   axios.get(`http://localhost:3001/users/`, {
       headers:{
         authorization:`Bearer ${token}`
+      },
+      params:{
+        pageSize:1,
+        pageNumber: pageNumber,
+        searchName:searchName
       }
     })
   },
-
+  GetCountUsers:  ( token,searchName) =>{
+    return   axios.get(`http://localhost:3001/users/count/`, {
+      headers:{
+        authorization:`Bearer ${token}`
+      },
+      params:{
+        searchName:searchName
+      }
+    })
+  },
   GetTasksUserForAdmin: async (user_Id, token,pageNumber,searchName) =>{
     return   axios.get(`http://localhost:3001/tasks/${user_Id}`, {
       headers:{
         authorization:`Bearer ${token}`
       },
       params:{
-        pageSize:2,
+        pageSize:1,
         pageNumber: pageNumber,
         searchName:searchName
       }

@@ -5,7 +5,7 @@ import { faSync } from '@fortawesome/free-solid-svg-icons';
 import './MoreButton.scss';
 
 
-function MoreButton  ({clickFunction}) {
+function MoreButton  ({textButton, clickFunction}) {
   const [rotate, setRotate] = useState (false)
 
   const onClick = () =>{
@@ -16,7 +16,7 @@ function MoreButton  ({clickFunction}) {
   return (
     <>
       <button className='moreButton' onClick={onClick}> 
-        more tasks <FontAwesomeIcon className={rotate ?'moreButton__icon' : 'moreButton__icon-rotate'}icon={faSync} />
+        {textButton} <FontAwesomeIcon className={rotate ?'moreButton__icon' : 'moreButton__icon-rotate'}icon={faSync} />
       </button>
     </>
   )
