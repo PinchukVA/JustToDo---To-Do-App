@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom'
 
 import './Tasks.scss';
 import preloader_L from '../../static/images/svg/preloader_L.svg';
-
+import { reducer } from '../../reducer/Reducer'
 import { usersApi } from '../../api/UsersApi'
 import { adminApi } from '../../api/AdminApi'
 import { 
@@ -17,9 +17,11 @@ import {
 } from '../../components'
 
 function Tasks () {
-
+  const initialState = {
+    isSearch: false,
+  }
   const {user_Id } = useParams();
-
+  const [state,dispatch] = useReducer(reducer,initialState)
   const appState = useSelector( state => state.Reducer)
   const { token,role,userId} = appState;
 
@@ -37,7 +39,6 @@ function Tasks () {
   const [isRequest, setIsRequest] = useState(true)
   const [sessionFault, setSessionFault] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
-  const [isSearch, setIsSearch] = useState(false)
   const [editTaskId, setEditTaskId] = useState()
   const [tasksCount, setTasksCount] = useState()
   const [page, setPage] = useState(0)
@@ -146,12 +147,12 @@ function Tasks () {
   const searchTask = async (e) => {
     e.preventDefault();
     const {searchText} = {...textField}
-    setIsSearch(true)
+    dispatch({type:'setIsSearch', payload: true})
     setTasksList([])
     setPage(0)
     await getCounts();
     if (searchText === '' ){
-      setIsSearch(false)
+      dispatch({type:'setIsSearch', payload: false})
     }
   }
 
@@ -245,7 +246,7 @@ function Tasks () {
     }
    return 
   }
-
+  
   return (
     <>
       <section className='tasks__section'>
@@ -267,7 +268,7 @@ function Tasks () {
           onSubmit = {handleTaskSubmit}
         /> }
 
-        {role==='admin' && !isSearch && < AddTaskForm 
+        {role==='admin' && !state.isSearch && < AddTaskForm 
           onSubmit = {handleTaskSubmit}
           onChange = {handleChange}
           nameInput = 'text'
