@@ -6,13 +6,14 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 .task-item__regular {
-  padding: 15px 45px;
+  padding: 5px;
   border-radius: 5px;
-  margin: 10px 0px;
+  margin: 3px 0px;
+  max-width: 560px;
   width: 100%;
   color: $text-black;
   display: flex;
@@ -26,13 +27,15 @@
 .item-id {
   font-family: $font-family-second;
   font-size: 18px;
-  margin-right: 10px;
+  margin-right: 5px;
+  width:6%;
+  text-align: center;
 }
 
 .item-name {
   font-family:$font-family-second;
   font-size: 16px;
-  max-width: 70%;
+  width: 39%;
 }
 
 .item-check {
@@ -41,12 +44,12 @@
 }
 
 .task-item__delete-button {
-  width:25%;
+  width:15%;
   font-family: $font-family-second;
   font-size: 14px;
   border-style:none;
-  padding: 16px 8px;
-  margin: 0px 10px;
+  padding: 10px 8px;
+  margin: 0px 5px 0px 0px;
   color: $text-white;
   border-radius: 5px;
   background-color: $background-mint;
@@ -73,4 +76,12 @@
     color:$color-green;
     transition: all 0.3s;
   }
+}
+
+.task-item__span{
+  font-family: $font-family-second;
+  font-size: 12px;
+  width:13.7%;
+  text-align: center;
+  line-height:18px;
 }

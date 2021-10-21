@@ -12,17 +12,94 @@
 }
 
 .tasks__wraper{
-  max-width: 540px;
+  max-width: 720px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+
 }
 
 .tasks-list{
   list-style: none;
   display: flex;
   flex-direction: column;
-  padding: 3px;
+  padding: 0px;
+  margin: 2px 0px;
 }
 
 .list-empty {
   @include message-empty;
+}
+
+.tasks__count {
+  margin: 5px 5px 0px 0px;
+  padding: 7px 0px 7px 7px;
+  font-family: $font-family-second;
+  color:$text-black;
+  font-size:10px;
+  text-transform: uppercase;
+  background-color: $background-white;
+  border-radius: 5px;
+  max-width: 155px;
+  width: 100%;
+  border: 1px solid $border-color-main;
+  display: flex;
+  flex-direction: column;
+
+  span {
+    color:$text-black;
+    margin:0px 3px;
+    font-weight:bold;
+    line-height: 18px;
+  }
+}
+
+.task__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.lists__header {
+  list-style: none;
+  padding: 19px 5px;
+  border-radius: 5px;
+  margin: 5px 0px 0px 0px;
+  max-width: 560px;
+  width: 100%;
+  color: $text-black;
+  display: flex;
+  align-items: center;
+  justify-content: space-start;
+  background-color: $background-white;
+  border: 1px solid $border-color-main;
+  transition: width 0.7s ease;
+
+  li {
+    font-family: $font-family-second;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+}
+
+.lists__name {
+  width:40%;
+  text-align: center;
+}
+
+.lists__num {
+  width: 6%;
+  text-align: center;
+}
+
+.lists__item {
+  width: 13%;
+  text-align: center;
+}
+
+.lists__del {
+  width: 6%;
+  text-align: center;
 }

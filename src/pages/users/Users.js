@@ -1,79 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import './Users.scss';
 import preloader_L from '../../static/images/svg/preloader_L.svg';
 
-import {  
-  addUsersList,
-  addUsersSearchList,
-  addUserSearch 
-} from '../../redux/actions/Actions';
 import { adminApi } from '../../api/AdminApi'
 import { 
   Search,
   UserItem,
-  PopUpLink
+  PopUpLink,
+  MoreButton
 } from '../../components'
 
 function Users () {
-
-  const dispatch = useDispatch();
-  
   const appState = useSelector( state => state.Reducer)
 
-  const { token,role,usersList, usersSearchList, isUserSearch} = appState;
+  const { token} = appState;
 
+  const [usersList,setUsersList]=useState([])
+  const [userCount, setUserCount] = useState()
   const [searchText, setSearchText] = useState('')
   const [isRequest, setIsRequest] = useState(true)
+  const [page, setPage] = useState(0)
   const [sessionFault, setSessionFault] = useState(false)
 
-  const getUsers = () =>{
-    const accsesstoken = token;
+  const getUsers = async () =>{
+    try{
+      const searchTextCopy = searchText
+      const res = await adminApi.getUsersForAdmin(token,page,searchTextCopy)
 
-    adminApi.getUsersForAdmin(accsesstoken)
-      .then((response)=>{
-        dispatch(addUsersList(response.data))
+      if (res.status === 200){
+        const userListCopy = [...usersList]
+        const userListNew = [...userListCopy, ...res.data]
+        console.log(`get users - ${userListCopy} - and - userListNer - ${userListNew} - and response.status - ${res.status} - and response.data ${res.data}`)
+        setPage(prevPage => prevPage + 1)
+        setUsersList(userListNew)
         setIsRequest(false)
-      },(error)=>{
-        if (error.response.status === 401){
-                setSessionFault(true)
-              }
-        console.log(error)
-      })
+      }
+    }catch(error){
+      if (error.response.status === 401){
+        setSessionFault(true)
+      }
+      console.log(error)
+    }
+  }
+
+  const getCounts  = async () =>{
+    try{
+      const searchTextCopy = searchText
+      const response = await adminApi.GetCountUsers(token,searchTextCopy)
+      const count = response.data
+      if (response.status === 200){
+        setUserCount(count.usersCount)
+      }
+    }
+    catch(error){
+      console.log(error)
+    }
   }
 
   useEffect(  () => {
+    console.log('USE_EFFECT_GO')
     setSessionFault(false)
-    getUsers()
-  }, []);
+    getCounts()
+    getUsers()  
+  }, [userCount]);
 
   const handleChangeSearchText = (e) => {
     setSearchText(e.target.value);
   };
 
-  const searchUser = () => {
-
-    let copyItems = [...usersList]
-    let copyText = searchText;
-    let searchArray = [];
-
-    copyText = copyText.replace(/\s/g, '').toUpperCase();
-    searchArray = copyItems.filter(item => item.userName.replace(/\s/g, '').toUpperCase().includes(copyText) === true);
-
-    dispatch(addUsersSearchList([...searchArray]));
-    dispatch(addUserSearch(!isUserSearch));
-
-    if (copyText === '' ){
-      dispatch(addUserSearch(false));
-      dispatch(addUsersSearchList([]));
-    }
-
-  }
-
-  const handleSearchSubmit = e => {
+  const handleSearchSubmit = async e => {
     e.preventDefault();
-    searchUser();
+    setPage(0)
+    setUsersList([])
+    await getCounts()
   }
 
   const renderUsers =  (arr) => {
@@ -100,7 +101,7 @@ function Users () {
     return
   };
 
-
+  console.log( 'Global params - usersList-', usersList, 'and global - counts -', userCount)
   return (
     <>
       <section className='users'>
@@ -108,7 +109,6 @@ function Users () {
         {sessionFault && <PopUpLink 
           text = 'The time of the session has expired. Log in again'
           buttonText = 'Sign in'
-          link = 'SignInRoute'
         />}
 
         <Search
@@ -120,12 +120,20 @@ function Users () {
           />
 
         <div className="users-wraper">
+          
+          { usersList.length !== 0  && <div className ='users__count' >
+            show <span>{usersList.length}</span > 
+            tasks out of  <span>{userCount}</span>
+          </div>}
 
           <ul className="users-list">
           {isRequest &&<img src={preloader_L}/>}
-          {!isUserSearch? renderUsers(usersList) : renderUsers(usersSearchList)}
-          
+          {renderUsers(usersList)}
           </ul>
+          {usersList !== 0 && userCount !== usersList.length && !isRequest && <MoreButton 
+          textButton = 'more users'
+          clickFunction={getUsers}
+          />}
 
         </div>
 

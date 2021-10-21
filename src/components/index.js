@@ -9,3 +9,4 @@ export { default as Search } from './search/Search';
 export { default as UserItem } from './userItem/UserItem';
 export { default as AddTaskForm } from './addTaskForm/AddTaskForm';
 export { default as EditForm } from './editForm/EditForm';
+export { default as MoreButton } from './moreButton/MoreButton';
