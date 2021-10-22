@@ -4,7 +4,8 @@ BackEnd for project coded by:  [NIkita Nikolskiy](https://github.com/Nikita27142
 BackEnd:  [Link](https://github.com/Nikita27142914/fe_api).  
 
 ## About
-Multipage Task Scheduler.The application allows you to view tasks, set new tasks, delete completed tasks and edit existing tasks. Two roles are available to users: User and Administrator  
+Multipage Task Scheduler.The application allows you to view tasks, set new tasks, delete completed tasks and edit existing tasks. Two roles are available to users: User and Administrator 
+Aplication develop with use -  **React, Redux, React-Router-Dom.**
 Users can:  
 * view received tasks  
 * search tasks  
@@ -23,4 +24,7 @@ Administrators also have the access to:
 *** 
 In the application, tasks and users are displayed by pagination
 ***  
-Aplication develop with use -  React, Redux, React-Router-Dom.
+SignIn page in app.
+![alt-текст](Screenshot_1.jpg "SignIn page")
+
+
