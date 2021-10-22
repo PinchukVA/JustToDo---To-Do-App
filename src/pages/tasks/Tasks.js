@@ -1,15 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useEffect, useReducer } from 'react';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom'
 
 import './Tasks.scss';
 import preloader_L from '../../static/images/svg/preloader_L.svg';
-
-import {  
-  addTasksList,
-  addTasksSearchList,
-  addTaskSearch 
-} from '../../redux/actions/Actions';
+import { reducer } from '../../reducer/Reducer'
 import { usersApi } from '../../api/UsersApi'
 import { adminApi } from '../../api/AdminApi'
 import { 
@@ -17,17 +12,18 @@ import {
   TaskUser,
   AddTaskForm,
   PopUpLink, 
-  EditForm
+  EditForm,
+  MoreButton,
 } from '../../components'
 
 function Tasks () {
-
+  const initialState = {
+    isSearch: false,
+  }
   const {user_Id } = useParams();
-
-  const dispatch = useDispatch();
-
+  const [state,dispatch] = useReducer(reducer,initialState)
   const appState = useSelector( state => state.Reducer)
-  const { token,role,tasksList, tasksSearchList, isTaskSearch} = appState;
+  const { token,role,userId} = appState;
 
   const[textField, setTextField]=useState ({
     text:'',
@@ -44,80 +40,102 @@ function Tasks () {
   const [sessionFault, setSessionFault] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [editTaskId, setEditTaskId] = useState()
+  const [tasksCount, setTasksCount] = useState()
+  const [page, setPage] = useState(0)
+  const [tasksList, setTasksList] = useState([])
 
-  const getLists = () =>{
-
-    const accsesstoken = token;
- 
-    const url = `http://localhost:3001/tasks/${user_Id}`
-
-    if ( role === 'user'){
-      usersApi.GetTasksForUser(accsesstoken)
-      .then((response)=>{
-        dispatch(addTasksList(response.data))
+  const getLists = async () =>{
+    try{
+      const {searchText} = {...textField}
+      let res;
+      if ( role === 'user'){
+        res= await usersApi.GetTasksForUser(token,page,searchText)
+      } else {
+        res = await adminApi.GetTasksUserForAdmin(user_Id,token,page,searchText)
+      }
+      if (res.status === 200){
+        const taskListCopy = [...tasksList]
+        const tasksListNew = [...taskListCopy, ...res.data]
+        setPage(prevPage => prevPage + 1)
+        setTasksList(tasksListNew)
         setIsRequest(false)
-      },(error)=>{
-        if (error.response.status === 401){
-                setSessionFault(true)
-              }
-        console.log(error)
-      })
-    } else {
-      adminApi.GetTasksUserForAdmin(url,accsesstoken)
-      .then((response)=>{
-        dispatch(addTasksList(response.data))
-        setIsRequest(false)
-      },(error)=>{
-        if (error.response.status === 401){
-                setSessionFault(true)
-              }
-        console.log(error)
-      })
+      }
+    }catch(error){
+      if (error.response.status === 401){
+        setSessionFault(true)
+      }
+      console.log(error)
     }
-    
   }
 
-  const patchTask = (taskID, taskListCopy, userId, typeBody='', IDchecked='',taskName='') =>{
-    let body ={}
-    const accsesstoken = token;
-    if (typeBody === 'checked'){
-       body = {
+  const patchTask = async (taskID, patchType) =>{
+    try{
+      const textFieldCopy = { ...textField}
+      const taskListCopy = [...tasksList];
+      const changeObj = taskListCopy.find((item) => item._id === taskID);
+      const id = role === 'admin' ? user_Id : userId
+      let body ={}
+      if (patchType === 'checked'){
+         body = {
+            id: taskID,
+            userId: id, 
+            checked: changeObj.checked
+            ? (changeObj.checked = false)
+            : (changeObj.checked = true)
+         }
+      }else{
+        body = {
           id: taskID,
-          userId: userId, 
-          checked: IDchecked
+          userId: id, 
+          name: textFieldCopy.editTask.trim()
        }
-    }else{
-      body = {
-        id: taskID,
-        userId: userId, 
-        name: taskName
-     }
-    }
-    console.log('patchTask--body', body)
-
-    usersApi.PatchTasksForUser(body, accsesstoken)
-      .then((response)=>{
-        console.log('Ответ - на патч', response)
-        if (response.data === 'OK'){
-          dispatch(addTasksList(taskListCopy))
-          if (typeBody === 'name'){
-            handleCloseEditTask()
-          }
+      }
+      const response = await usersApi.PatchTasksForUser(body, token)
+      if (response.data === 'OK'){
+        setTasksList(taskListCopy)
+        if (patchType === 'name'){
+          changeObj.name = textFieldCopy.editTask
+          setTasksList(taskListCopy)
+          setIsEdit(!isEdit)
         }
-        setIsRequest(false)
-      },(error)=>{
-        if (error.response.status === 401){
-                setSessionFault(true)
-              }
-        console.log(error)
-      })
+      }
+      setIsRequest(false)
+    }catch(error){
+      console.log(error)
+      const  res  = {...error.response.data}
+      if (error.response.status === 401){
+        setSessionFault(true)
+      }
+      if (res.status === "Fail"){
+        const helpFieldTextCopy = {...helpFieldText}
+        helpFieldTextCopy.editTask = res.message
+        setHelpFieldText(helpFieldTextCopy)
+      }
+    }
+  }
+
+  const getCounts  = async () =>{
+    try{
+      const {searchText} = {...textField}
+      let response;
+      if ( role === 'user'){
+        response = await usersApi.GetCountForUser(token,searchText)
+      }else{
+        response = await adminApi.GetCountForAdmin(user_Id,token,searchText)
+      }
+      const count = response.data
+      setTasksCount(count.tasksCount)
+    }
+    catch(error){
+      console.log(error)
+    }
   }
 
   useEffect(  () => {
     setSessionFault(false)
+    getCounts()
     getLists()
-  }, []);
-
+  }, [tasksCount]);
 
   const handleChange = (e) => {
     const textFieldCopy = {...textField}
@@ -126,92 +144,60 @@ function Tasks () {
     setHelpFieldText({})
   }
 
-  const searchTask = (e) => {
+  const searchTask = async (e) => {
     e.preventDefault();
-    let taskListCopy = [...tasksList]
-    let copyText = textField.searchText;
-    let searchArray = [];
-
-    copyText = copyText.replace(/\s/g, '').toUpperCase();
-    searchArray = taskListCopy.filter(item => item.name.replace(/\s/g, '').toUpperCase().includes(copyText) === true);
-
-    dispatch(addTasksSearchList([...searchArray]));
-    dispatch(addTaskSearch(!isTaskSearch));
-
-    if (copyText === '' ){
-      dispatch(addTaskSearch(false));
-      dispatch(addTasksSearchList([]));
+    const {searchText} = {...textField}
+    dispatch({type:'setIsSearch', payload: true})
+    setTasksList([])
+    setPage(0)
+    await getCounts();
+    if (searchText === '' ){
+      dispatch({type:'setIsSearch', payload: false})
     }
-
   }
 
-  const handleDeleteTask = id => {
-
-    const accsesstoken = token;
-
-    let user_Id_Copy = user_Id;
-    let tasksListCopy = [...tasksList]
-    let tasksSearchListCopy = [...tasksSearchList]
-
-
-    let delId = tasksListCopy.findIndex((item) => item._id === id);
-    let delIdSearch = tasksSearchListCopy.findIndex((item) => item._id === id);
-
-    tasksListCopy.splice(delId, 1);
-    tasksSearchListCopy.splice(delIdSearch, 1);
-
-    adminApi.deleteUserTask(id, user_Id_Copy, accsesstoken)
-    .then((response)=>{
+  const handleDeleteTask = async (id) => {
+    try{
+      const response = await adminApi.deleteUserTask(id, user_Id, token)
       if (response.status === 204){
-      dispatch(addTasksList(tasksListCopy))
-      dispatch(addTasksSearchList(tasksSearchListCopy))
-      }
-    },(error)=>{
-      console.log(error.response.status)
-      console.log(error)
-    })
-  }
-
-  const checkInput = (e) => {
-    let result = true;
-    let arrayCopy = [...tasksList]
-    let copyText = textField[e.target.name];
-
-    copyText = copyText.replace(/\s/g, '');
-
-    let index = arrayCopy.findIndex(item => item.name.replace(/\s/g, '') === copyText);
-
-    if (index === -1){
-      result = false
-    }
-    return result;
-  }
-
-  const createTask = () =>{
-
-    const taskListCopy = [...tasksList]
-    const textFieldCopy ={...textField}
-    const copyText = textField.text;
-    const user_Id_Copy = user_Id;
-
-    adminApi.createUserTask(copyText, user_Id_Copy, token)
-      .then((response)=>{
-        if (response.statusText === 'Created'){
-          dispatch(addTasksList(taskListCopy.concat(response.data)))
-          textFieldCopy.text = ''
-          setTextField(textFieldCopy)
+        const tasksListCopy = [...tasksList]
+        const delId = tasksListCopy.findIndex((item) => item._id === id);
+        tasksListCopy.splice(delId, 1);
+        setTasksList(tasksListCopy)
+        getCounts()
         }
-      },(error)=>{
-        if (error.response.status === 401){
-                setSessionFault(true)
-              }
-        console.log(error)
-      })
+    }catch(error){
+      console.log(error)
+    }
+  }
+
+  const createTask = async () =>{
+    try{
+      const textFieldCopy ={...textField}
+      const copyText = textField.text.trim();
+      const response = await adminApi.createUserTask(copyText,user_Id, token)
+  
+      if (response.statusText === 'Created'){
+        textFieldCopy.text = ''
+        setTextField(textFieldCopy)
+        getCounts()
+      }
+    }catch(error){
+      console.log(error)
+      const  res  = {...error.response.data}
+      if (error.response.status === 401){
+        setSessionFault(true)
+      }
+      if (res.status === "Fail"){
+        const helpFieldTextCopy = {...helpFieldText}
+        helpFieldTextCopy.text = res.message
+        setHelpFieldText(helpFieldTextCopy)
+      }
+    }
   }
 
   const handleTaskSubmit = e => {
     e.preventDefault();
-
     const helpFieldTextCopy = {...helpFieldText}
 
     if ( textField[e.target.name].trim().length < 4 ){
@@ -220,52 +206,18 @@ function Tasks () {
       return;
     }
 
-    if ( checkInput(e) ) {
-      helpFieldTextCopy[e.target.name] = 'task already exists'
-      setHelpFieldText(helpFieldTextCopy)
-      return; 
-    }
-
     if ( e.target.name === 'text' ){
       createTask()
     }else{
-      editTask()
+      patchTask(editTaskId, 'name')
     }
-    
   }
 
-  const handleChangecheckBox = id => {
-    const taskListCopy = [...tasksList];
-    const changeObj = taskListCopy.find((item) => item._id === id);
-
-    changeObj.checked
-      ? (changeObj.checked = false)
-      : (changeObj.checked = true);
-    patchTask(id, taskListCopy, changeObj.userId, 'checked', changeObj.checked)
-  }
-
-  const handleOpenEditTask = (id) => {
+  const handleOpenEditTask = (id,name) => {
     const textFieldCopy = { ...textField}
-    const taskListCopy = [...tasksList];
-    const changeObj = taskListCopy.find((item) => item._id === id);
-    textFieldCopy.editTask=changeObj.name
+    textFieldCopy.editTask=name
     setEditTaskId(id)
     setTextField(textFieldCopy)
-    setIsEdit(!isEdit);
-  }
-
-  const editTask = () =>{
-    const taskListCopy = [...tasksList];
-    const textFieldCopy = { ...textField}
-    const changeObj = taskListCopy.find((item) => item._id === editTaskId);
-
-    changeObj.name = textFieldCopy.editTask
-    console.log('editTask--',changeObj )
-
-    patchTask(editTaskId, taskListCopy, changeObj.userId, 'name','',textFieldCopy.editTask)
-  }
-
-  const handleCloseEditTask = () => {
     setIsEdit(!isEdit);
   }
 
@@ -279,22 +231,22 @@ function Tasks () {
         )
       }
 
-      result = arr.map((item) => (
+      result = arr.map((item,index) => (
         < TaskUser
           key={item._id}
           item={item}
-          taskId = {arr.indexOf(item)+1}
-          onChange={() => handleChangecheckBox(item._id)}
+          taskId = {index+1}
+          onChange={() => patchTask(item._id, 'checked')}
           role={role}
           onClick={() => handleDeleteTask(item._id)}
-          handleClick={() => handleOpenEditTask(item._id)}
+          handleClick={() => handleOpenEditTask(item._id,item.name)}
         />
       ));
       return result;
     }
    return 
   }
-
+  
   return (
     <>
       <section className='tasks__section'>
@@ -302,12 +254,11 @@ function Tasks () {
         {sessionFault && <PopUpLink 
           text = 'The time of the session has expired. Log in again'
           buttonText = 'Sign in'
-          link = 'SignInRoute'
         />}
 
         {isEdit && role==='admin' && 
         <EditForm
-          onClick={()=>handleCloseEditTask()}
+          onClick={()=>setIsEdit(!isEdit)}
           onChange = {handleChange}
           value={textField.editTask}
           nameInput='editTask'
@@ -317,7 +268,7 @@ function Tasks () {
           onSubmit = {handleTaskSubmit}
         /> }
 
-        {role==='admin' && !isTaskSearch && < AddTaskForm 
+        {role==='admin' && !state.isSearch && < AddTaskForm 
           onSubmit = {handleTaskSubmit}
           onChange = {handleChange}
           nameInput = 'text'
@@ -325,8 +276,6 @@ function Tasks () {
           helpText={helpFieldText.text}
           value={textField.text}
         />}
-
-        
 
         <Search
           placeholder = 'Find Task'
@@ -337,11 +286,36 @@ function Tasks () {
         />
 
         <div className='tasks__wraper'>
-            
-            <ul className='tasks-list'>
-            {isRequest &&<img src={preloader_L}/>}
-            {!isTaskSearch? renderTasks(tasksList) : renderTasks(tasksSearchList)}
+
+          <div className='task__header'> 
+
+            { tasksList.length !== 0  && <div className ='tasks__count' >
+              <span> show tasks: {tasksList.length}</span > 
+              <span> all task: {tasksCount}</span>
+            </div>}
+
+            <ul className ='lists__header'>
+              <li className ='lists__num'>#</li>
+              <li className ='lists__name'>task name</li>
+              <li className ='lists__item' >create by</li>
+              <li className ='lists__item'>create at</li>
+              <li className ='lists__item'>update by</li>
+              <li className ='lists__item'>update at</li>
+              <li className ='lists__del'>done</li>
             </ul>
+
+          </div>
+
+          <ul className='tasks-list'>
+          {isRequest &&<img src={preloader_L}/>}
+          {renderTasks(tasksList)}
+          </ul>
+
+          {tasksCount !== 0 && tasksCount !== tasksList.length && !isRequest && <MoreButton 
+          textButton = 'more tasks'
+          clickFunction={getLists}
+          />}
+
         </div>
 
       </section>

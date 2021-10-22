@@ -1,15 +1,36 @@
 import React from 'react';
-import { Link} from 'react-router-dom';
+import { useHistory} from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import './PopUpLink.scss'
 
 import { Routes } from '../../utils/routes.js';
 
-function PopUpLink (props) {
+import { signIn } from '../../redux/actions/Actions';
+import { setCookie } from '../../utils/Cookies'
 
-  // const link = props.link
-  // console.log('PopUpLink', link)
-  // console.log('PopUpLink', typeof link)
+function PopUpLink ({text, buttonText}) {
+
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  const clearState = () => {
+    console.log('clear state')
+    const clearState = {
+      token:'', 
+      role:'',
+      userId:'',
+      usersList: [],
+      usersSearchList: [],
+      tasksList: [],
+      tasksSearchList: [],
+      isUserSearch:false,
+      isTaskSearch:false 
+    }
+    setCookie('authorization', '' )
+    dispatch(signIn(clearState))
+    history.replace(Routes.SignInRoute)
+  }
 
   return (
     <>
@@ -17,10 +38,8 @@ function PopUpLink (props) {
 
       <div className='popUp_block slideDown'>
 
-            <p className='popUp_text'>{props.text}</p>
-            <Link to={Routes[props.link]}>
-            <button className='popUp_button'>{props.buttonText}</button>
-            </Link>
+            <p className='popUp_text'>{text}</p>
+            <button className='popUp_button' onClick={clearState}>{buttonText}</button>
 
         </div>
 

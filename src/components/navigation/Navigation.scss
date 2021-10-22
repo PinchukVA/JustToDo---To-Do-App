@@ -7,6 +7,19 @@
   max-width: 1140px;
   margin: 0px auto;
   border-bottom: 2px solid $border-color-mint;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    font-family: $font-family-main;
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color:$text-mint;
+    margin: 0px 15px;
+  }
+
 }
 
 .navigation-list {
