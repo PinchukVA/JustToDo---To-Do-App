@@ -24,7 +24,11 @@ Administrators also have the access to:
 * search among user tasks  
 *** 
 In the application, tasks and users are displayed by pagination
-***  
+*** 
+<center>Page with users</center>
+![alt-текст](Screenshot_2.jpg "SignIn page")  
+<center>Admin page with tasks for user</center>   
+![alt-текст](Screenshot_3.jpg "SignIn page")  
 
 
 
