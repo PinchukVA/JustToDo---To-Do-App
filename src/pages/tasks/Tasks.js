@@ -40,10 +40,10 @@ function Tasks () {
   const [sessionFault, setSessionFault] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [editTaskId, setEditTaskId] = useState()
-  const [tasksCount, setTasksCount] = useState()
+  const [tasksCount, setTasksCount] = useState(0)
   const [page, setPage] = useState(0)
   const [tasksList, setTasksList] = useState([])
-
+  
   const getLists = async () =>{
     try{
       const {searchText} = {...textField}
@@ -56,8 +56,10 @@ function Tasks () {
       if (res.status === 200){
         const taskListCopy = [...tasksList]
         const tasksListNew = [...taskListCopy, ...res.data]
-        setPage(prevPage => prevPage + 1)
-        setTasksList(tasksListNew)
+        if (res.data.length !== 0){
+          setTasksList(tasksListNew)
+          setPage(prevPage => prevPage + 1)
+        }
         setIsRequest(false)
       }
     }catch(error){
@@ -132,10 +134,11 @@ function Tasks () {
   }
 
   useEffect(  () => {
+    console.log('useEffect-start')
     setSessionFault(false)
     getCounts()
     getLists()
-  }, [tasksCount]);
+  }, []);
 
   const handleChange = (e) => {
     const textFieldCopy = {...textField}
@@ -150,8 +153,12 @@ function Tasks () {
     dispatch({type:'setIsSearch', payload: true})
     setTasksList([])
     setPage(0)
+    
     await getCounts();
+
     if (searchText === '' ){
+      setTasksList([])
+      setPage(0)
       dispatch({type:'setIsSearch', payload: false})
     }
   }
@@ -165,6 +172,7 @@ function Tasks () {
         tasksListCopy.splice(delId, 1);
         setTasksList(tasksListCopy)
         getCounts()
+        setPage(prevPage => prevPage - 1)
         }
     }catch(error){
       console.log(error)
@@ -225,9 +233,15 @@ function Tasks () {
     if (!isRequest){
       let result;
 
-      if (arr.length === 0){
+      if (arr.length === 0 && tasksCount !== 0 ){
         return(
-          <span className='list-empty' >The task list is empty</span>
+          <span className='list-empty' >Click to show the tasks</span>
+        )
+      }
+
+      if (arr.length === 0 && tasksCount === 0 ){
+        return(
+          <span className='list-empty' >Sorry, tasks list is empty</span>
         )
       }
 
@@ -246,7 +260,7 @@ function Tasks () {
     }
    return 
   }
-  
+
   return (
     <>
       <section className='tasks__section'>
@@ -289,10 +303,10 @@ function Tasks () {
 
           <div className='task__header'> 
 
-            { tasksList.length !== 0  && <div className ='tasks__count' >
+             <div className ='tasks__count' >
               <span> show tasks: {tasksList.length}</span > 
               <span> all task: {tasksCount}</span>
-            </div>}
+            </div>
 
             <ul className ='lists__header'>
               <li className ='lists__num'>#</li>
@@ -310,7 +324,6 @@ function Tasks () {
           {isRequest &&<img src={preloader_L}/>}
           {renderTasks(tasksList)}
           </ul>
-
           {tasksCount !== 0 && tasksCount !== tasksList.length && !isRequest && <MoreButton 
           textButton = 'more tasks'
           clickFunction={getLists}

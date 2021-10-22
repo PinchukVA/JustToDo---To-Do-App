@@ -32,9 +32,10 @@ function Users () {
       if (res.status === 200){
         const userListCopy = [...usersList]
         const userListNew = [...userListCopy, ...res.data]
-        console.log(`get users - ${userListCopy} - and - userListNer - ${userListNew} - and response.status - ${res.status} - and response.data ${res.data}`)
-        setPage(prevPage => prevPage + 1)
-        setUsersList(userListNew)
+        if (res.data.length !== 0){
+          setUsersList(userListNew)
+          
+        }
         setIsRequest(false)
       }
     }catch(error){
@@ -44,6 +45,11 @@ function Users () {
       console.log(error)
     }
   }
+
+  const getNewItem = async () =>{
+    await getUsers ()
+    setPage(prevPage => prevPage + 1)
+   }
 
   const getCounts  = async () =>{
     try{
@@ -63,8 +69,9 @@ function Users () {
     console.log('USE_EFFECT_GO')
     setSessionFault(false)
     getCounts()
-    getUsers()  
-  }, [userCount]);
+    getUsers() 
+    setPage(prevPage => prevPage + 1) 
+  }, []);
 
   const handleChangeSearchText = (e) => {
     setSearchText(e.target.value);
@@ -101,7 +108,7 @@ function Users () {
     return
   };
 
-  console.log( 'Global params - usersList-', usersList, 'and global - counts -', userCount)
+  
   return (
     <>
       <section className='users'>
@@ -121,10 +128,10 @@ function Users () {
 
         <div className="users-wraper">
           
-          { usersList.length !== 0  && <div className ='users__count' >
+           <div className ='users__count' >
             show <span>{usersList.length}</span > 
-            tasks out of  <span>{userCount}</span>
-          </div>}
+            users out of  <span>{userCount}</span>
+          </div>
 
           <ul className="users-list">
           {isRequest &&<img src={preloader_L}/>}
@@ -132,7 +139,7 @@ function Users () {
           </ul>
           {usersList !== 0 && userCount !== usersList.length && !isRequest && <MoreButton 
           textButton = 'more users'
-          clickFunction={getUsers}
+          clickFunction={getNewItem}
           />}
 
         </div>
