@@ -3,7 +3,8 @@ Project coded by:  [Vitaly Pinchuk](https://www.linkedin.com/in/vitaly-pinchuk-8
 BackEnd for project coded by:  [NIkita Nikolskiy](https://github.com/Nikita27142914).  
 BackEnd:  [Link](https://github.com/Nikita27142914/fe_api).  
 
-## About
+## About  
+![alt-текст](Screenshot_1.jpg "SignIn page")  
 Multipage Task Scheduler.The application allows you to view tasks, set new tasks, delete completed tasks and edit existing tasks. Two roles are available to users: User and Administrator 
 Aplication develop with use -  **React, Redux, React-Router-Dom.**
 Users can:  
@@ -24,7 +25,6 @@ Administrators also have the access to:
 *** 
 In the application, tasks and users are displayed by pagination
 ***  
-SignIn page in app.
-![alt-текст](Screenshot_1.jpg "SignIn page")
+
 
 
